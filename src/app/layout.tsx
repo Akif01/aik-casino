@@ -3,6 +3,7 @@ import "./globals.css";
 import styles from "./RootLayout.module.css";
 import { Orbitron } from 'next/font/google';
 import Navbar from "./navbar";
+import BalanceHeader from "./balanceHeader";
 
 const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '700', '900'] });
 
@@ -17,7 +18,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={orbitron.className}>
         <header className={styles.header}>
-          Aik Casino - Built by Akif
+          <div>Aik Casino - Built by Akif</div>
+          <BalanceHeader />
         </header>
 
         <div className={styles.navbarMainWrapper}>

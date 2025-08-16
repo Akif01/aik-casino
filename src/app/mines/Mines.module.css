@@ -23,18 +23,18 @@
 }
 
 .gridCellRevealed {
-    background-color: #0f0;
+    background-color: #0f0 !important;
     cursor: not-allowed;
 }
 
 .gridCellRevealed:hover {
     transform: none;
-    background-color: #0f0;
+    background-color: #0f0 !important;
 }
 
 .gridCellMineRevealed,
 .gridCellMineRevealed:hover {
-    background-color: red;
+    background-color: red !important;
 }
 
 .result {

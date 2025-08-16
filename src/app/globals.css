@@ -41,7 +41,18 @@ button:hover {
   background-color: #0c0;
 }
 
+button:disabled,
+button:disabled:hover {
+  cursor: not-allowed;
+  background-color: gray;
+  transform: none;
+}
+
 input {
   border: 1px solid #0f0;
   padding: 5px;
+}
+
+input:disabled {
+  cursor: not-allowed;
 }
