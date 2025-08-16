@@ -15,7 +15,8 @@
 .navbar {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: -webkit-fill-available;
+    min-height: 100vh;
     min-width: 150px;
     overflow-y: auto;
     border-right: 1px solid gray;
@@ -42,7 +43,8 @@
 
 .main {
     display: flex;
-    height: 100vh;
+    height: fit-content;
+    min-height: 100vh;
     padding: 1rem 1rem;
     font-weight: 400;
     color: #0f0;

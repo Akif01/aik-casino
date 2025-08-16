@@ -1,17 +1,44 @@
+.mainContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.gridSettings {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+}
+
 .grid {
     display: grid;
-    grid-template-columns: repeat(5, 5rem);
+    grid-template-columns: repeat(5, 100px);
     gap: 10px;
 }
 
 .gridCell {
+    width: 100px;
+    height: 100px;
     background-color: gray;
-    border: 1px solid #0f0;
-    width: 5rem;
-    height: 5rem;
-    transition: transform 300ms ease-out;
 }
 
-.gridCell:hover {
-    transform: scale(1.1);
+.gridCellRevealed {
+    background-color: #0f0;
+    cursor: not-allowed;
+}
+
+.gridCellRevealed:hover {
+    transform: none;
+    background-color: #0f0;
+}
+
+.gridCellMineRevealed,
+.gridCellMineRevealed:hover {
+    background-color: red;
+}
+
+.result {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
 }
