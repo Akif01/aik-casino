@@ -1,4 +1,4 @@
-# 🎮 Aik Casino
+# 🎰 Aik Casino
 
 Aik Casino is an online casino web app built with Next.js. Play interactive games like Mines, configure your grid size and mine count, and experience real-time gameplay with secure server-side logic. Fully customizable and designed for a smooth, responsive UI.
 
