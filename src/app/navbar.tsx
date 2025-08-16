@@ -6,6 +6,7 @@ import styles from "./RootLayout.module.css";
 const navItems = [
     { label: "Home", href: "/" },
     { label: "Mines", href: "/mines" },
+    { label: "Tower", href: "/tower" },
 ];
 
 export default function Navbar() {

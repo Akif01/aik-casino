@@ -6,13 +6,16 @@ import { useState } from "react";
 type GameState = "waiting" | "playing" | "lost" | "won";
 
 export default function MinesPage() {
-    const mineCount = 3;
-
     const [gameId, setGameId] = useState<string | null>(null);
     const [revealed, setRevealed] = useState<Set<number>>(new Set());
     const [mines, setMines] = useState<Set<number>>(new Set());
     const [gameState, setGameState] = useState<GameState>("waiting");
-    const [gridSize, setGridSize] = useState(5); // default 5x5
+
+    const [gridSize, setGridSize] = useState(5);
+    const [pendingGridSize, setPendingGridSize] = useState(5); // editable value
+
+    const [mineAmount, setMineAmount] = useState(1);
+    const [pendingMineAmount, setPendingMineAmount] = useState(1); // editable value
 
     const startEndpoint = "/api/mines/start";
     const clickEndpoint = "/api/mines/click";
@@ -20,16 +23,18 @@ export default function MinesPage() {
     async function startGame() {
         setRevealed(new Set());
         setMines(new Set());
-        setGameState("playing");
 
         const res = await fetch(startEndpoint, {
             method: "POST",
-            body: JSON.stringify({ gridSize, mineCount }),
+            body: JSON.stringify({ size: pendingGridSize, mineCount: pendingMineAmount }),
             headers: { "Content-Type": "application/json" },
         });
 
         const data = await res.json();
         setGameId(data.gameId);
+        setGridSize(data.size);
+        setMineAmount(data.mineCount);
+        setGameState(data.state); // use server state
     }
 
     async function handleClick(index: number) {
@@ -43,51 +48,81 @@ export default function MinesPage() {
 
         const data = await res.json();
 
-        if (data.result === "mine") {
-            setRevealed((prev) => new Set([...prev, index]));
+        // Update revealed cells
+        setRevealed(new Set(data.revealed));
+
+        // If clicked a mine
+        if (data.state === "lost") {
             setMines(new Set([...mines, index]));
-            setGameState("lost");
-        } else {
-            setRevealed(new Set(data.revealed));
-            if (data.hasWon) {
-                setGameState("won");
-            }
         }
+
+        // Update game state from server
+        setGameState(data.state);
     }
 
     return (
         <div className={style.mainContent}>
             <div className={style.gridSettings}>
-                <label htmlFor="gridSizeInput">Grid Size</label>
-                <input name="gridSizeInput"
+                <label htmlFor="gridSizeInput">Grid Size:</label>
+                <input
+                    name="gridSizeInput"
                     type="number"
-                    min="5"
-                    max="10"
+                    min={5}
+                    max={10}
                     disabled={gameState === "playing"}
-                    value={gridSize}
-                    onChange={(e) => setGridSize(Number(e.target.value))}
+                    value={pendingGridSize}
+                    onChange={(e) => {
+                        let value = Number(e.target.value);
+                        if (value < 5) value = 5;
+                        if (value > 10) value = 10;
+                        setPendingGridSize(value);
+                    }}
                 />
-                <button disabled={gameState === "playing"} onClick={startGame} className={style.startButton}>
+                <label htmlFor="mineAmountInput">Mine amount:</label>
+                <input
+                    name="mineAmountInput"
+                    type="number"
+                    min={1}
+                    max={pendingGridSize * pendingGridSize - 1}
+                    disabled={gameState === "playing"}
+                    value={pendingMineAmount}
+                    onChange={(e) => {
+                        let value = Number(e.target.value);
+                        if (value < 1) value = 1;
+                        if (value > pendingGridSize * pendingGridSize - 1)
+                            value = pendingGridSize * pendingGridSize - 1;
+                        setPendingMineAmount(value);
+                    }}
+                />
+                <button
+                    disabled={gameState === "playing"}
+                    onClick={startGame}
+                    className={style.startButton}
+                >
                     Start Game
                 </button>
             </div>
-            {gameState === "won" || gameState === "lost" && (
-                // win UI
-                <div></div>
+
+            {(gameState === "won" || gameState === "lost") && (
+                <div className={style.winMessage}>
+                    <h2>{gameState === "won" ? "You Win!" : "You hit a mine!"}</h2>
+                </div>
             )}
+
             {gameState !== "waiting" && (
-                <div className={style.grid}
-                    style={{ gridTemplateColumns: `repeat(${gridSize}, 100px)` }}>
+                <div
+                    className={style.grid}
+                    style={{ gridTemplateColumns: `repeat(${gridSize}, 100px)` }}
+                >
                     {Array.from({ length: gridSize * gridSize }, (_, i) => (
                         <button
                             key={i}
                             onClick={() => handleClick(i)}
                             disabled={revealed.has(i) || gameState !== "playing"}
                             className={`${style.gridCell} 
-                                ${revealed.has(i) ? style.gridCellRevealed : " "} 
-                                ${mines.has(i) ? style.gridCellMineRevealed : " "}`}
-                        >
-                        </button>
+                                ${revealed.has(i) ? style.gridCellRevealed : ""} 
+                                ${mines.has(i) ? style.gridCellMineRevealed : ""}`}
+                        />
                     ))}
                 </div>
             )}
