@@ -1,89 +1,98 @@
 "use client";
-import styles from "./Mines.module.css"
+
+import style from "./Mines.module.css";
 import { useState } from "react";
 
-type Cell = {
-    id: number;
-    isMine: boolean;
-    revealed: boolean;
-};
+type GameState = "playing" | "lost" | "won";
 
-export default function Mines() {
-    const [grid, setGrid] = useState<Cell[]>([]);
-    const [gameOver, setGameOver] = useState(false);
-    const [won, setWon] = useState(false);
-    const [amountOfMines, setAmountOfMines] = useState(2);
+export default function MinesPage() {
+    const size = 5; // 5x5 board
+    const mineCount = 3;
 
-    const initGame = () => {
-        const cells: Cell[] = [];
-        const mineIndices = new Set<number>();
+    const [gameId, setGameId] = useState<string | null>(null);
+    const [revealed, setRevealed] = useState<Set<number>>(new Set());
+    const [mines, setMines] = useState<Set<number>>(new Set());
+    const [gameState, setGameState] = useState<GameState>("playing");
 
-        while (mineIndices.size < amountOfMines) {
-            mineIndices.add(Math.floor(Math.random() * 25));
+    const startEndpoint = "/api/mines/start";
+    const clickEndpoint = "/api/mines/click";
+
+    async function startGame() {
+        setRevealed(new Set());
+        setMines(new Set());
+        setGameState("playing");
+
+        const res = await fetch(startEndpoint, {
+            method: "POST",
+            body: JSON.stringify({ size, mineCount }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await res.json();
+        setGameId(data.gameId);
+    }
+
+    async function handleClick(index: number) {
+        if (!gameId || gameState !== "playing") return;
+
+        const res = await fetch(clickEndpoint, {
+            method: "POST",
+            body: JSON.stringify({ gameId, cell: index }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await res.json();
+
+        if (data.result === "mine") {
+            setRevealed((prev) => new Set([...prev, index]));
+            setMines(new Set([...mines, index]));
+            setGameState("lost");
+        } else {
+            setRevealed(new Set(data.revealed));
+            if (data.hasWon) {
+                setGameState("won");
+            }
         }
-
-        for (let i = 0; i < 25; i++) {
-            cells.push({
-                id: i,
-                isMine: mineIndices.has(i),
-                revealed: false,
-            });
-        }
-
-        setGrid(cells);
-        setGameOver(false);
-        setWon(false);
-    };
-
-    const handleClick = (id: number) => {
-        if (gameOver || won) return;
-
-        setGrid((prev) =>
-            prev.map((cell) =>
-                cell.id === id ? { ...cell, revealed: true } : cell
-            )
-        );
-
-        const clicked = grid.find((c) => c.id === id);
-        if (clicked && clicked.isMine) {
-            setGameOver(true);
-            return;
-        }
-
-        // check for win
-        const totalSafeCells = grid.filter((c) => !c.isMine).length;
-        const revealedSafeCells = grid.filter(
-            (c) => !c.isMine && (c.id === id ? true : c.revealed)
-        ).length;
-
-        if (revealedSafeCells === totalSafeCells) {
-            setWon(true);
-        }
-    };
-
-    if (grid.length === 0) initGame();
+    }
 
     return (
         <div>
-            <div className={styles.grid}>
-                {grid.map((cell) => (
-                    <button
-                        key={cell.id}
-                        onClick={() => handleClick(cell.id)}
-                        disabled={cell.revealed || gameOver || won}
-                        className={styles.gridCell}
-                    >
-                        {cell.revealed ? (cell.isMine ? "💣" : "✅") : ""}
-                    </button>
-                ))}
-            </div>
+            {!gameId ? (
+                <button onClick={startGame} className={style.startButton}>
+                    Start Game
+                </button>
+            ) : (
+                <>
+                    <div className={style.grid}>
+                        {Array.from({ length: size * size }, (_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => handleClick(i)}
+                                disabled={revealed.has(i) || gameState !== "playing"}
+                                className={style.gridCell}
+                            >
+                                {revealed.has(i)
+                                    ? mines.has(i)
+                                        ? "💣"
+                                        : "✅"
+                                    : ""}
+                            </button>
+                        ))}
+                    </div>
 
-            {(gameOver || won) && (
-                <div>
-                    {gameOver && <p>Busted! 💥</p>}
-                    {won && <p>You Win! 🎉</p>}
-                    <button onClick={initGame}>Restart</button>
-                </div>
+                    {gameState !== "playing" && (
+                        <div style={{ marginTop: "20px" }}>
+                            <h2>
+                                {gameState === "lost"
+                                    ? "You hit a mine!"
+                                    : "You win!"}
+                            </h2>
+                            <button onClick={startGame} className={style.restartButton}>
+                                Restart
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
