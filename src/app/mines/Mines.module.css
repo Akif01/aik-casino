@@ -1,0 +1,17 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 5rem);
+    gap: 10px;
+}
+
+.gridCell {
+    background-color: gray;
+    border: 1px solid #0f0;
+    width: 5rem;
+    height: 5rem;
+    transition: transform 300ms ease-out;
+}
+
+.gridCell:hover {
+    transform: scale(1.1);
+}
