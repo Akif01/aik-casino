@@ -14,6 +14,9 @@ export async function POST(req: Request) {
 
     global.balances[sessionId] += change;
 
+    console.log(change);
+    console.log(global.balances[sessionId]);
+
     return NextResponse.json({
         sessionId,
         balance: global.balances[sessionId],

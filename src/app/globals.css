@@ -60,7 +60,7 @@ input:disabled {
 
 .inputGroup {
   position: relative;
-  margin: 1rem 0;
+  margin-top: 0.5rem;
 }
 
 .inputGroup input {

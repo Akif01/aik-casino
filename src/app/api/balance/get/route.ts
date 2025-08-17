@@ -6,15 +6,15 @@ declare global {
 }
 global.balances ??= {};
 
-export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const sessionId = searchParams.get("sessionId");
+export async function POST(req: Request) {
+    const sessionId = await req.json();
 
-    if (!sessionId || !global.balances[sessionId]) {
-        // Create a new session
-        const newSessionId = crypto.randomUUID();
-        global.balances[newSessionId] = 10000; // starting balance
-        return NextResponse.json({ sessionId: newSessionId, balance: 10000 });
+    if (!sessionId)
+        return NextResponse.json({ error: "No session provided" }, { status: 400 });
+
+    if (!global.balances[sessionId]) {
+        global.balances[sessionId] = 10000; // starting balance
+        return NextResponse.json({ sessionId: sessionId, balance: 10000 });
     }
 
     return NextResponse.json({

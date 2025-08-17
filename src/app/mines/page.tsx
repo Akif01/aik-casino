@@ -1,11 +1,17 @@
 "use client";
 
+import { getBalance, updateBalance } from "@/services/balanceService";
 import style from "./Mines.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSessionId } from "@/services/sessionService";
+import { useSession } from "@/lib/sessionContext";
 
 type GameState = "waiting" | "playing" | "lost" | "won";
 
 export default function MinesPage() {
+    const startEndpoint = "/api/mines/start";
+    const clickEndpoint = "/api/mines/click";
+
     const [gameId, setGameId] = useState<string | null>(null);
     const [revealed, setRevealed] = useState<Set<number>>(new Set());
     const [mines, setMines] = useState<Set<number>>(new Set());
@@ -17,8 +23,12 @@ export default function MinesPage() {
     const [mineAmount, setMineAmount] = useState(1);
     const [pendingMineAmount, setPendingMineAmount] = useState(1); // editable value
 
-    const startEndpoint = "/api/mines/start";
-    const clickEndpoint = "/api/mines/click";
+    const [multiplier, setMultiplier] = useState(0);
+
+    const [betAmount, setBetAmount] = useState(1);
+    const [cashout, setCashout] = useState(0);
+
+    const { sessionId, balance, setBalanceUI } = useSession();
 
     async function startGame() {
         setRevealed(new Set());
@@ -26,7 +36,7 @@ export default function MinesPage() {
 
         const res = await fetch(startEndpoint, {
             method: "POST",
-            body: JSON.stringify({ size: pendingGridSize, mineCount: pendingMineAmount }),
+            body: JSON.stringify({ size: pendingGridSize, mineCount: pendingMineAmount, betAmount: betAmount }),
             headers: { "Content-Type": "application/json" },
         });
 
@@ -37,8 +47,20 @@ export default function MinesPage() {
         setGameState(data.state); // use server state
     }
 
+    async function cashoutGame() {
+        if (!gameId || gameState !== "playing") return;
+
+        if (!sessionId) return;
+
+        const { balance } = await updateBalance(sessionId, cashout);
+        setBalanceUI(balance);
+        setGameState("won");
+    }
+
     async function handleClick(index: number) {
         if (!gameId || gameState !== "playing") return;
+
+        if (!sessionId) return;
 
         const res = await fetch(clickEndpoint, {
             method: "POST",
@@ -48,16 +70,22 @@ export default function MinesPage() {
 
         const data = await res.json();
 
-        // Update revealed cells
         setRevealed(new Set(data.revealed));
 
-        // If clicked a mine
         if (data.state === "lost") {
-            setMines(new Set([...mines, index]));
+            setMines(prev => new Set([...prev, index]));
+            const { balance } = await updateBalance(sessionId, -data.betAmount);
+            setBalanceUI(balance);
         }
 
-        // Update game state from server
+        if (data.state === "won") {
+            const { balance } = await updateBalance(sessionId, data.betAmount);
+            setBalanceUI(balance);
+        }
+
         setGameState(data.state);
+        setMultiplier(data.multiplier);
+        setCashout(data.cashout);
     }
 
     return (
@@ -102,6 +130,28 @@ export default function MinesPage() {
                     <label htmlFor="mineAmountInput">Mines</label>
                 </div>
 
+                <div className="inputGroup">
+                    <input
+                        id="betAmountInput"
+                        type="number"
+                        style={{ minWidth: "150px" }}
+                        min={1}
+                        max={balance!}
+                        disabled={gameState === "playing"}
+                        value={betAmount}
+                        onChange={(e) => {
+                            let value = Number(e.target.value);
+
+                            if (value < 1) value = 1;
+                            if (value > balance!) value = balance!;
+
+                            setBetAmount(value);
+                        }}
+                        required
+                    />
+                    <label htmlFor="betAmountInput">Bet</label>
+                </div>
+
                 <button
                     disabled={gameState === "playing"}
                     onClick={startGame}
@@ -111,7 +161,20 @@ export default function MinesPage() {
                 </button>
             </div>
 
+            {(gameState === "playing") && (
+                <>
+                    <div>
+                        Multiplier: {multiplier}x
+                    </div>
+                    <button
+                        disabled={gameState !== "playing"}
+                        onClick={cashoutGame}
+                    >
+                        Cashout ${cashout}
+                    </button>
+                </>
 
+            )}
             {(gameState === "won" || gameState === "lost") && (
                 <div className={style.winMessage}>
                     <h2>{gameState === "won" ? "You Win!" : "You hit a mine!"}</h2>

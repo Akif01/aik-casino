@@ -1,11 +1,10 @@
-export async function getBalance(sessionId?: string) {
-    const url = sessionId
-        ? `/api/balance/get?sessionId=${sessionId}`
-        : `/api/balance/get`;
+export async function getBalance(sessionId: string) {
+    const url = "/api/balance/get";
 
     const res = await fetch(url, {
-        method: "GET",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId })
     });
 
     if (!res.ok) throw new Error("Failed to fetch balance");

@@ -3,7 +3,7 @@ import crypto from "crypto";
 import activeGames from "@/lib/activeGames";
 
 export async function POST(req: Request) {
-    const { size = 5, mineCount = 5 } = await req.json();
+    const { size = 5, mineCount = 5, betAmount = 0 } = await req.json();
 
     const gridSize = Math.min(Math.max(size, 5), 10);
     const minesToPlace = Math.min(mineCount, gridSize * gridSize - 1);
@@ -13,10 +13,20 @@ export async function POST(req: Request) {
         mines.add(crypto.randomInt(0, gridSize * gridSize));
     }
 
-    mines.forEach(x => console.log(x));
-
     const gameId = crypto.randomUUID();
-    activeGames[gameId] = { size: gridSize, mines, revealed: new Set(), state: "playing" };
+    activeGames[gameId] = {
+        size: gridSize,
+        mines,
+        revealed: new Set(),
+        state: "playing",
+        betAmount
+    };
 
-    return NextResponse.json({ gameId, size: gridSize, mineCount: minesToPlace, state: "playing" });
+    return NextResponse.json({
+        gameId,
+        size: gridSize,
+        mineCount: minesToPlace,
+        betAmount,
+        state: "playing"
+    });
 }

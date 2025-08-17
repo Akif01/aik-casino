@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import activeGames from "@/lib/activeGames";
+import { calculateMultiplier, calculateCashout } from "@/lib/minesMultiplier";
 
 export async function POST(req: Request) {
     const { gameId, cell } = await req.json();
@@ -8,7 +9,10 @@ export async function POST(req: Request) {
     if (!game) return NextResponse.json({ error: "Game not found" }, { status: 400 });
 
     if (game.state !== "playing") {
-        return NextResponse.json({ error: "Game is already finished", state: game.state }, { status: 400 });
+        return NextResponse.json(
+            { error: "Game is already finished", state: game.state },
+            { status: 400 }
+        );
     }
 
     if (game.mines.has(cell)) {
@@ -18,6 +22,9 @@ export async function POST(req: Request) {
             result: "mine",
             revealed: Array.from(game.revealed),
             state: game.state,
+            multiplier: 0,
+            cashout: 0,
+            betAmount: game.betAmount,
         });
     }
 
@@ -32,9 +39,14 @@ export async function POST(req: Request) {
         game.state = "won";
     }
 
+    const multiplier = calculateMultiplier(game.size, game.mines.size, revealedSafeCells);
+    const cashout = calculateCashout(game.betAmount, game.size, game.mines.size, revealedSafeCells);
+
     return NextResponse.json({
         result: "safe",
         revealed: Array.from(game.revealed),
         state: game.state,
+        multiplier,
+        cashout,
     });
 }
