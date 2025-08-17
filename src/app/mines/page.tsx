@@ -45,6 +45,9 @@ export default function MinesPage() {
         setGridSize(data.size);
         setMineAmount(data.mineCount);
         setGameState(data.state); // use server state
+
+        console.log("Starting game with data:", data);
+
     }
 
     async function cashoutGame() {
@@ -55,6 +58,8 @@ export default function MinesPage() {
         const { balance } = await updateBalance(sessionId, cashout);
         setBalanceUI(balance);
         setGameState("won");
+
+        console.log("Cashout game with cashout:" + cashout);
     }
 
     async function handleClick(index: number) {
@@ -86,6 +91,8 @@ export default function MinesPage() {
         setGameState(data.state);
         setMultiplier(data.multiplier);
         setCashout(data.cashout);
+
+        console.log("Click with data:", data);
     }
 
     return (
@@ -134,7 +141,7 @@ export default function MinesPage() {
                     <input
                         id="betAmountInput"
                         type="number"
-                        style={{ minWidth: "150px" }}
+                        style={{ minWidth: "150px", maxWidth: "150px" }}
                         min={1}
                         max={balance!}
                         disabled={gameState === "playing"}
@@ -144,7 +151,8 @@ export default function MinesPage() {
 
                             if (value < 1) value = 1;
                             if (value > balance!) value = balance!;
-
+                            console.log("BetAmountInput:" + betAmount);
+                            console.log("BetAmountInput_Balance:" + balance);
                             setBetAmount(value);
                         }}
                         required
