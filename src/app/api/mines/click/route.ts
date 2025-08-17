@@ -1,6 +1,5 @@
 import { getBalanceBySession } from "@/lib/BalanceService";
-import { calculateCashout, calculateMultiplier } from "@/lib/MinesMultiplier";
-import { handleCellClicked } from "@/lib/MinesService";
+import { calculateCashout, calculateMultiplier, handleCellClicked } from "@/lib/MinesService";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

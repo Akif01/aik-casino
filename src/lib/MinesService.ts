@@ -1,6 +1,5 @@
 import { getBalanceBySession, updateBalanceBySession } from "./BalanceService";
 import crypto from "crypto";
-import { calculateCashout } from "./MinesMultiplier";
 
 export async function handleStartGame(
     sessionId: string,
@@ -19,6 +18,17 @@ export async function handleStartGame(
     while (mines.size < minesToPlace) {
         mines.add(crypto.randomInt(0, gridSize * gridSize));
     }
+
+    // find safe spots
+    const safeSpots: number[] = [];
+    for (let i = 0; i < gridSize * gridSize; i++) {
+        if (!mines.has(i)) {
+            safeSpots.push(i);
+        }
+    }
+
+    console.log("Safe spots at:", safeSpots);
+    console.log("Mine spots at:", [...mines]);
 
     const gameId = crypto.randomUUID();
 
@@ -57,6 +67,7 @@ export async function handleCellClicked(sessionId: string, gameId: string, cellI
     ).length;
 
     if (revealedSafeCells >= safeCells) {
+        await handleCashoutGame(sessionId, gameId);
         game.state = "won";
     }
 
@@ -80,4 +91,29 @@ export async function handleCashoutGame(sessionId: string, gameId: string) {
     game.state = "won";
 
     return cashout;
+}
+
+export function calculateMultiplier(gridSize: number, mineCount: number, revealedSafeCells: number) {
+    const totalCells = gridSize * gridSize;
+    const safeCells = totalCells - mineCount;
+    if (safeCells <= 0) return 0;
+
+    // Base growth per safe click
+    const baseGrowth = 1 + (mineCount / totalCells); // slightly higher reward for more mines
+
+    // Use linear progression instead of full exponent
+    const multiplier = 1 + revealedSafeCells * (baseGrowth - 1);
+
+    return parseFloat(multiplier.toFixed(2));
+}
+
+export function calculateCashout(
+    betAmount: number,
+    gridSize: number,
+    mines: number,
+    revealedSafeCells: number
+): number {
+    if (betAmount < 1) return 0;
+    const multiplier = calculateMultiplier(gridSize, mines, revealedSafeCells);
+    return Number((betAmount * (multiplier - 1)).toFixed(2));
 }
