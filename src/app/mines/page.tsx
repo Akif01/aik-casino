@@ -63,7 +63,7 @@ export default function MinesPage() {
     return (
         <div className={style.mainContent}>
             <div className={style.gridSettings}>
-                <div className={style.inputGroup}>
+                <div className="inputGroup">
                     <input
                         id="gridSizeInput"
                         type="number"
@@ -82,7 +82,7 @@ export default function MinesPage() {
                     <label htmlFor="gridSizeInput">Grid Size</label>
                 </div>
 
-                <div className={style.inputGroup}>
+                <div className="inputGroup">
                     <input
                         id="mineAmountInput"
                         type="number"
