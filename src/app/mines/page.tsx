@@ -63,37 +63,45 @@ export default function MinesPage() {
     return (
         <div className={style.mainContent}>
             <div className={style.gridSettings}>
-                <label htmlFor="gridSizeInput">Grid Size:</label>
-                <input
-                    name="gridSizeInput"
-                    type="number"
-                    min={5}
-                    max={10}
-                    disabled={gameState === "playing"}
-                    value={pendingGridSize}
-                    onChange={(e) => {
-                        let value = Number(e.target.value);
-                        if (value < 5) value = 5;
-                        if (value > 10) value = 10;
-                        setPendingGridSize(value);
-                    }}
-                />
-                <label htmlFor="mineAmountInput">Mine amount:</label>
-                <input
-                    name="mineAmountInput"
-                    type="number"
-                    min={1}
-                    max={pendingGridSize * pendingGridSize - 1}
-                    disabled={gameState === "playing"}
-                    value={pendingMineAmount}
-                    onChange={(e) => {
-                        let value = Number(e.target.value);
-                        if (value < 1) value = 1;
-                        if (value > pendingGridSize * pendingGridSize - 1)
-                            value = pendingGridSize * pendingGridSize - 1;
-                        setPendingMineAmount(value);
-                    }}
-                />
+                <div className={style.inputGroup}>
+                    <input
+                        id="gridSizeInput"
+                        type="number"
+                        min={5}
+                        max={10}
+                        disabled={gameState === "playing"}
+                        value={pendingGridSize}
+                        onChange={(e) => {
+                            let value = Number(e.target.value);
+                            if (value < 5) value = 5;
+                            if (value > 10) value = 10;
+                            setPendingGridSize(value);
+                        }}
+                        required
+                    />
+                    <label htmlFor="gridSizeInput">Grid Size</label>
+                </div>
+
+                <div className={style.inputGroup}>
+                    <input
+                        id="mineAmountInput"
+                        type="number"
+                        min={1}
+                        max={pendingGridSize * pendingGridSize - 1}
+                        disabled={gameState === "playing"}
+                        value={pendingMineAmount}
+                        onChange={(e) => {
+                            let value = Number(e.target.value);
+                            if (value < 1) value = 1;
+                            if (value > pendingGridSize * pendingGridSize - 1)
+                                value = pendingGridSize * pendingGridSize - 1;
+                            setPendingMineAmount(value);
+                        }}
+                        required
+                    />
+                    <label htmlFor="mineAmountInput">Mines</label>
+                </div>
+
                 <button
                     disabled={gameState === "playing"}
                     onClick={startGame}
@@ -102,6 +110,7 @@ export default function MinesPage() {
                     Start Game
                 </button>
             </div>
+
 
             {(gameState === "won" || gameState === "lost") && (
                 <div className={style.winMessage}>

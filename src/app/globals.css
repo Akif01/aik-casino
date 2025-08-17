@@ -55,4 +55,5 @@ input {
 
 input:disabled {
   cursor: not-allowed;
+  color: gray;
 }
