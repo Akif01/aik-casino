@@ -57,3 +57,72 @@ input:disabled {
   cursor: not-allowed;
   color: gray;
 }
+
+.inputGroup {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 12px 8px;
+  font-size: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  background: none;
+}
+
+.inputGroup label {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  background: transparent;
+  padding: 0 4px;
+  font-size: 0.9rem;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  border: none;
+}
+
+/* When input is focused or filled */
+.inputGroup input:focus+label,
+.inputGroup input:not(:placeholder-shown)+label {
+  top: -8px;
+  font-size: 0.75rem;
+}
+
+/* Rainbow border effect on focus */
+.inputGroup input:focus {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(black, black) padding-box,
+    /* input background */
+    linear-gradient(270deg,
+      #ff0000,
+      #ff7300,
+      #fffb00,
+      #48ff00,
+      #00ffd5,
+      #002bff,
+      #7a00ff,
+      #ff00ab,
+      #ff0000) border-box;
+  background-size: 300% 300%;
+  animation: rainbowBorder 4s linear infinite;
+}
+
+@keyframes rainbowBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
