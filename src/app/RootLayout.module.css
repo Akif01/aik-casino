@@ -37,8 +37,13 @@
 }
 
 .navbarItemActive {
-    background-color: #555;
-    color: #eee;
+    background-color: white;
+    color: black;
+}
+
+.navbarItemActive:hover {
+    background-color: white;
+    color: black;
 }
 
 .main {
