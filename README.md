@@ -14,16 +14,27 @@ Aik Casino is an online casino web app built with Next.js. Play interactive game
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repo:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+   ```bash
+   git clone https://github.com/Akif01/aik-casino.git
+   cd aik-casino
+
+2. Install dependencies
+
+   ```bash
+   npm install
+
+3. Run the dev server
+
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    # or
+    pnpm dev
+    # or
+    bun dev
+    ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
