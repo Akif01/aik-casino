@@ -1,26 +1,19 @@
 "use client";
 
-import { getBalance, updateBalance } from "@/services/balanceService";
 import style from "./Mines.module.css";
 import { useEffect, useState } from "react";
-import { getSessionId } from "@/services/sessionService";
 import { useSession } from "@/lib/sessionContext";
-
-type GameState = "waiting" | "playing" | "lost" | "won";
+import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesService";
+import { getBalance } from "@/services/balanceService";
 
 export default function MinesPage() {
-    const startEndpoint = "/api/mines/start";
-    const clickEndpoint = "/api/mines/click";
 
     const [gameId, setGameId] = useState<string | null>(null);
     const [revealed, setRevealed] = useState<Set<number>>(new Set());
     const [mines, setMines] = useState<Set<number>>(new Set());
     const [gameState, setGameState] = useState<GameState>("waiting");
 
-    const [gridSize, setGridSize] = useState(5);
     const [pendingGridSize, setPendingGridSize] = useState(5); // editable value
-
-    const [mineAmount, setMineAmount] = useState(1);
     const [pendingMineAmount, setPendingMineAmount] = useState(1); // editable value
 
     const [multiplier, setMultiplier] = useState(0);
@@ -34,20 +27,24 @@ export default function MinesPage() {
         setRevealed(new Set());
         setMines(new Set());
 
-        const res = await fetch(startEndpoint, {
-            method: "POST",
-            body: JSON.stringify({ size: pendingGridSize, mineCount: pendingMineAmount, betAmount: betAmount }),
-            headers: { "Content-Type": "application/json" },
-        });
-
-        const data = await res.json();
+        const data = await startMinesGame(
+            pendingGridSize,
+            pendingMineAmount,
+            betAmount
+        );
         setGameId(data.gameId);
-        setGridSize(data.size);
-        setMineAmount(data.mineCount);
-        setGameState(data.state); // use server state
+        setPendingGridSize(data.size);
+        setPendingMineAmount(data.mineCount);
+        setGameState(data.state);
+        setCashout(data.cashout);
+        setMultiplier(data.multiplier);
 
         console.log("Starting game with data:", data);
+    }
 
+    async function updateBalanceUI(sessionId: string) {
+        const { balance } = await getBalance(sessionId);
+        setBalanceUI(balance);
     }
 
     async function cashoutGame() {
@@ -55,44 +52,31 @@ export default function MinesPage() {
 
         if (!sessionId) return;
 
-        const { balance } = await updateBalance(sessionId, cashout);
-        setBalanceUI(balance);
-        setGameState("won");
-
-        console.log("Cashout game with cashout:" + cashout);
+        const { cashout, state } = await cashoutMinesGame(sessionId, gameId);
+        updateBalanceUI(sessionId);
+        setGameState(state);
     }
 
     async function handleClick(index: number) {
-        if (!gameId || gameState !== "playing") return;
+        if (!sessionId || !gameId || gameState !== "playing") return;
 
         if (!sessionId) return;
 
-        const res = await fetch(clickEndpoint, {
-            method: "POST",
-            body: JSON.stringify({ gameId, cell: index }),
-            headers: { "Content-Type": "application/json" },
-        });
-
-        const data = await res.json();
-
+        const data = await cellClickedMinesGame(sessionId, gameId, index);
         setRevealed(new Set(data.revealed));
 
         if (data.state === "lost") {
+            updateBalanceUI(sessionId);
             setMines(prev => new Set([...prev, index]));
-            const { balance } = await updateBalance(sessionId, -data.betAmount);
-            setBalanceUI(balance);
         }
 
         if (data.state === "won") {
-            const { balance } = await updateBalance(sessionId, data.betAmount);
-            setBalanceUI(balance);
+            updateBalanceUI(sessionId);
         }
 
         setGameState(data.state);
         setMultiplier(data.multiplier);
         setCashout(data.cashout);
-
-        console.log("Click with data:", data);
     }
 
     return (
@@ -148,7 +132,6 @@ export default function MinesPage() {
                         value={betAmount}
                         onChange={(e) => {
                             let value = Number(e.target.value);
-
                             if (value < 1) value = 1;
                             if (value > balance!) value = balance!;
                             console.log("BetAmountInput:" + betAmount);
@@ -189,23 +172,21 @@ export default function MinesPage() {
                 </div>
             )}
 
-            {gameState !== "waiting" && (
-                <div
-                    className={style.grid}
-                    style={{ gridTemplateColumns: `repeat(${gridSize}, 100px)` }}
-                >
-                    {Array.from({ length: gridSize * gridSize }, (_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => handleClick(i)}
-                            disabled={revealed.has(i) || gameState !== "playing"}
-                            className={`${style.gridCell} 
-                                ${revealed.has(i) ? style.gridCellRevealed : ""} 
-                                ${mines.has(i) ? style.gridCellMineRevealed : ""}`}
-                        />
-                    ))}
-                </div>
-            )}
+            <div
+                className={style.grid}
+                style={{ gridTemplateColumns: `repeat(${pendingGridSize}, 100px)` }}
+            >
+                {Array.from({ length: pendingGridSize * pendingGridSize }, (_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => handleClick(i)}
+                        disabled={revealed.has(i) || gameState !== "playing"}
+                        className={`${style.gridCell} 
+                            ${revealed.has(i) ? style.gridCellRevealed : ""} 
+                            ${mines.has(i) ? style.gridCellMineRevealed : ""}`}
+                    />
+                ))}
+            </div>
         </div>
     );
 }

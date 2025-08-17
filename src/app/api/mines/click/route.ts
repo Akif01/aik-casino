@@ -1,23 +1,21 @@
+import { getBalanceBySession } from "@/lib/BalanceService";
+import { calculateCashout, calculateMultiplier } from "@/lib/MinesMultiplier";
+import { handleCellClicked } from "@/lib/MinesService";
 import { NextResponse } from "next/server";
-import activeGames from "@/lib/activeGames";
-import { calculateMultiplier, calculateCashout } from "@/lib/minesMultiplier";
 
 export async function POST(req: Request) {
-    const { gameId, cell } = await req.json();
-    const game = activeGames[gameId];
+    const { sessionId, gameId, cellIndex } = await req.json();
 
-    if (!game) return NextResponse.json({ error: "Game not found" }, { status: 400 });
+    const game = await handleCellClicked(sessionId, gameId, cellIndex);
 
-    if (game.state !== "playing") {
+    if (!game) {
         return NextResponse.json(
-            { error: "Game is already finished", state: game.state },
+            { error: "Game not found or already finished" },
             { status: 400 }
         );
     }
 
-    if (game.mines.has(cell)) {
-        game.revealed.add(cell);
-        game.state = "lost";
+    if (game.state === "lost") {
         return NextResponse.json({
             result: "mine",
             revealed: Array.from(game.revealed),
@@ -28,16 +26,10 @@ export async function POST(req: Request) {
         });
     }
 
-    game.revealed.add(cell);
-
-    const safeCells = game.size * game.size - game.mines.size;
+    game.revealed.add(cellIndex);
     const revealedSafeCells = Array.from(game.revealed).filter(
         (i) => !game.mines.has(i)
     ).length;
-
-    if (revealedSafeCells >= safeCells) {
-        game.state = "won";
-    }
 
     const multiplier = calculateMultiplier(game.size, game.mines.size, revealedSafeCells);
     const cashout = calculateCashout(game.betAmount, game.size, game.mines.size, revealedSafeCells);

@@ -1,6 +1,12 @@
 export { };
 
-type GameState = "waiting" | "playing" | "won" | "lost";
+declare global {
+    type GameState = "waiting" | "playing" | "lost" | "won";
+}
+
+declare global {
+    var balances: Record<string, number>;
+}
 
 declare global {
     var activeGames: Record<

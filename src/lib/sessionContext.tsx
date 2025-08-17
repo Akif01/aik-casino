@@ -19,7 +19,7 @@ const SessionContext = createContext<SessionContextType>({
 
 export function SessionProvider({ children }: { children: ReactNode }) {
     const [sessionId, setSessionId] = useState<string | null>(null);
-    const [balance, setBalance] = useState<number | null>(null);
+    const [balance, setBalanceUI] = useState<number | null>(null);
 
     useEffect(() => {
         const initSession = async () => {
@@ -31,14 +31,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
                 setSessionId(sessionId);
 
                 // fetch initial balance
-                const data = await getBalance(sessionId);
-                setBalance(data.balance);
+                const { balance } = await getBalance(sessionId);
+                setBalanceUI(balance);
+                console.log("Balance:", balance);
             } else {
                 setSessionId(storedSession);
 
                 // fetch balance for stored session
                 const data = await getBalance(storedSession);
-                setBalance(data.balance);
+                setBalanceUI(data.balance);
+                console.log("Balance:", data.balance);
             }
         };
 
@@ -46,7 +48,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <SessionContext.Provider value={{ sessionId, setSessionId, balance, setBalanceUI: setBalance }}>
+        <SessionContext.Provider value={{ sessionId, setSessionId, balance, setBalanceUI: setBalanceUI }}>
             {children}
         </SessionContext.Provider>
     );

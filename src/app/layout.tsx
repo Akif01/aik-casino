@@ -5,13 +5,15 @@ import { Orbitron } from 'next/font/google';
 import Navbar from "./navbar";
 import BalanceHeader from "./balanceHeader";
 import { SessionProvider } from "@/lib/sessionContext";
-
+import { initGlobals } from "@/lib/initGlobals";
 const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '700', '900'] });
 
 export const metadata: Metadata = {
   title: "Aik Casino",
   description: "Online Casino built with Next.js",
 };
+
+initGlobals();
 
 export default function RootLayout({
   children,

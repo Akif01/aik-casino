@@ -11,13 +11,15 @@ export async function getBalance(sessionId: string) {
     return res.json() as Promise<{ sessionId: string; balance: number }>;
 }
 
-export async function updateBalance(sessionId: string, change: number) {
-    const res = await fetch("/api/balance/update", {
+export async function updateBalance(sessionId: string, amount: number) {
+    const url = "/api/balance/update";
+
+    const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, change }),
+        body: JSON.stringify({ sessionId, amount })
     });
 
-    if (!res.ok) throw new Error("Failed to update balance");
+    if (!res.ok) throw new Error("Failed to fetch balance");
     return res.json() as Promise<{ sessionId: string; balance: number }>;
 }
