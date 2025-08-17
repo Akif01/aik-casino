@@ -1,8 +1,16 @@
-import { updateBalanceBySession } from "./BalanceService";
+import { getBalanceBySession, updateBalanceBySession } from "./BalanceService";
 import crypto from "crypto";
 import { calculateCashout } from "./MinesMultiplier";
 
-export async function handleStartGame(size: number, mineCount: number, betAmount: number) {
+export async function handleStartGame(
+    sessionId: string,
+    size: number,
+    mineCount: number,
+    betAmount: number) {
+    const availableBalance = await getBalanceBySession(sessionId);
+
+    if (!availableBalance || availableBalance < betAmount)
+        return;
 
     const gridSize = Math.min(Math.max(size, 5), 10);
     const minesToPlace = Math.min(mineCount, gridSize * gridSize - 1);

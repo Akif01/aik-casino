@@ -23,15 +23,34 @@ export default function MinesPage() {
 
     const { sessionId, balance, setBalanceUI } = useSession();
 
+    useEffect(() => {
+        if (balance == null) return;
+
+        // if current bet is higher than balance, reset it
+        if (betAmount > balance) {
+            setBetAmount(balance);
+        }
+
+        // if balance is zero, force bet to zero
+        if (balance === 0) {
+            setBetAmount(0);
+        }
+    }, [balance]);
+
     async function startGame() {
         setRevealed(new Set());
         setMines(new Set());
 
         const data = await startMinesGame(
+            sessionId!,
             pendingGridSize,
             pendingMineAmount,
             betAmount
         );
+
+        if (!data)
+            return;
+
         setGameId(data.gameId);
         setPendingGridSize(data.size);
         setPendingMineAmount(data.mineCount);
@@ -98,7 +117,7 @@ export default function MinesPage() {
                         }}
                         required
                     />
-                    <label htmlFor="gridSizeInput">Grid Size</label>
+                    <label htmlFor="gridSizeInput">Grid</label>
                 </div>
 
                 <div className="inputGroup">
@@ -126,16 +145,14 @@ export default function MinesPage() {
                         id="betAmountInput"
                         type="number"
                         style={{ minWidth: "150px", maxWidth: "150px" }}
-                        min={1}
-                        max={balance!}
+                        min={balance === 0 ? 0 : 1}
+                        max={balance ?? 1} // fallback to 1
                         disabled={gameState === "playing"}
                         value={betAmount}
                         onChange={(e) => {
                             let value = Number(e.target.value);
-                            if (value < 1) value = 1;
-                            if (value > balance!) value = balance!;
-                            console.log("BetAmountInput:" + betAmount);
-                            console.log("BetAmountInput_Balance:" + balance);
+                            if (value < (balance === 0 ? 0 : 1)) value = (balance === 0 ? 0 : 1);
+                            if (value > (balance ?? 0)) value = balance ?? 0;
                             setBetAmount(value);
                         }}
                         required

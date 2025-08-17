@@ -8,7 +8,7 @@ export default function BalanceHeader() {
 
     return (
         <div className={style.balance}>
-            {balance !== null ? `Balance: ${balance.toFixed(2)}` : "Loading..."}
+            {balance !== null ? `Balance: $${balance.toFixed(2)}` : "Loading..."}
         </div>
     );
 }

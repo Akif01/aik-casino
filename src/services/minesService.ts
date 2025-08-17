@@ -2,11 +2,15 @@ const startEndpoint = "/api/mines/start";
 const clickEndpoint = "/api/mines/click";
 const cashoutEndpoint = "/api/mines/cashout";
 
-export async function startMinesGame(size: number, mineCount: number, betAmount: number) {
+export async function startMinesGame(
+    sessionId: string,
+    size: number,
+    mineCount: number,
+    betAmount: number) {
     const res = await fetch(startEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ size, mineCount, betAmount }),
+        body: JSON.stringify({ sessionId, size, mineCount, betAmount }),
     });
     if (!res.ok) throw new Error("Failed to start game");
     return res.json() as Promise<{
