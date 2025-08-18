@@ -17,6 +17,7 @@ export default function MinesPage() {
     const [pendingMineAmount, setPendingMineAmount] = useState(1); // editable value
 
     const [multiplier, setMultiplier] = useState(0);
+    const [cellMultipliers, setCellMultipliers] = useState<Record<number, number>>({});
 
     const [betAmount, setBetAmount] = useState(1);
     const [cashout, setCashout] = useState(0);
@@ -96,6 +97,11 @@ export default function MinesPage() {
         setGameState(data.state);
         setMultiplier(data.multiplier);
         setCashout(data.cashout);
+
+        setCellMultipliers(prev => ({
+            ...prev,
+            [index]: data.multiplier,
+        }));
     }
 
     return (
@@ -171,15 +177,15 @@ export default function MinesPage() {
 
             {(gameState === "playing") && (
                 <>
-                    <div>
-                        Multiplier: {multiplier}x
-                    </div>
                     <button
                         disabled={gameState !== "playing"}
                         onClick={cashoutGame}
                     >
                         Cashout ${cashout}
                     </button>
+                    <div>
+                        Multiplier: {multiplier}x
+                    </div>
                 </>
 
             )}
@@ -201,7 +207,12 @@ export default function MinesPage() {
                         className={`${style.gridCell} 
                             ${revealed.has(i) ? style.gridCellRevealed : ""} 
                             ${mines.has(i) ? style.gridCellMineRevealed : ""}`}
-                    />
+                    >
+                        {revealed.has(i) ? (
+                            <span className={style.multiplierText}>{cellMultipliers[i]}x</span>
+                        ) : (
+                            "")}
+                    </button>
                 ))}
             </div>
         </div>

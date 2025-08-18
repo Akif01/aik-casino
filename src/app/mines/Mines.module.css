@@ -48,3 +48,21 @@
     gap: 1rem;
     align-items: baseline;
 }
+
+.multiplierText {
+    display: inline-block;
+    animation: flyDown 0.6s ease-out forwards;
+    font-size: 1.2rem;
+}
+
+@keyframes flyDown {
+    from {
+        transform: translateY(-40px) scale(1.5);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
