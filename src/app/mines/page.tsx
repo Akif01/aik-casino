@@ -154,7 +154,7 @@ export default function MinesPage() {
                         min={balance === 0 ? 0 : 1}
                         max={balance ?? 1} // fallback to 1
                         disabled={gameState === "playing"}
-                        value={Math.round(betAmount)}
+                        value={betAmount}
                         onChange={(e) => {
                             let value = Number(e.target.value);
                             if (value < (balance === 0 ? 0 : 1)) value = (balance === 0 ? 0 : 1);

@@ -20,23 +20,25 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+        />
+      </head>
       <body className={orbitron.className}>
         <SessionProvider>
-          <header className={styles.header}>
-            <div>Aik Casino - Built by Akif</div>
-            <BalanceHeader />
-          </header>
-
-          <div className={styles.navbarMainWrapper}>
+          <div className={styles.layoutContainer}>
             <Navbar />
-            <main className={styles.main}>
-              {children}
-            </main>
+            <div className={styles.headerAndMainContainer}>
+              <header className={styles.header}>
+                <BalanceHeader />
+              </header>
+              <main className={styles.main}>
+                {children}
+              </main>
+            </div>
           </div>
-
-          <footer className={styles.footer}>
-            Casino Footer
-          </footer>
         </SessionProvider>
       </body>
     </html>
