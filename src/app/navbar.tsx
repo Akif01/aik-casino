@@ -21,10 +21,10 @@ export default function Navbar() {
                     href={item.href}
                     className={`${styles.navbarItem} ${pathname === item.href ? styles.navbarItemActive : ""}`}
                 >
-                    <span className="material-symbols-outlined">
+                    <span className={`${styles.navbarItemIcon} material-symbols-outlined`}>
                         {item.icon}
                     </span>
-                    {item.label}
+                    <span className={styles.navbarItemLabel}>{item.label}</span>
                 </Link>
             ))}
         </nav>
