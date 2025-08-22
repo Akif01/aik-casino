@@ -1,6 +1,6 @@
 "use client";
-import { getSessionId } from "@/services/sessionService";
-import { getBalance } from "@/services/balanceService";
+import { getSessionId } from "@/services/sessionRequesterService";
+import { getBalance } from "@/services/balanceRequesterService";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface SessionContextType {

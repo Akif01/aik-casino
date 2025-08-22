@@ -80,6 +80,11 @@ export async function handleCashoutGame(sessionId: string, gameId: string) {
     if (!game || game.state !== "playing")
         return;
 
+    const availableBalance = await getBalanceBySession(sessionId);
+
+    if (!availableBalance || availableBalance < game.betAmount)
+        return;
+
     const cashout = calculateCashout(
         game.betAmount,
         game.size,
@@ -96,13 +101,14 @@ export async function handleCashoutGame(sessionId: string, gameId: string) {
 export function calculateMultiplier(gridSize: number, mineCount: number, revealedSafeCells: number) {
     const totalCells = gridSize * gridSize;
     const safeCells = totalCells - mineCount;
+
     if (safeCells <= 0) return 0;
 
-    // Base growth per safe click
-    const baseGrowth = 1 + (mineCount / totalCells); // slightly higher reward for more mines
+    // Base growth depends on mine density
+    const baseGrowth = 1 + (mineCount / totalCells) * 2;
 
-    // Use linear progression instead of full exponent
-    const multiplier = 1 + revealedSafeCells * (baseGrowth - 1);
+    // Exponential growth with diminishing returns
+    const multiplier = Math.pow(baseGrowth, revealedSafeCells / 2);
 
     return parseFloat(multiplier.toFixed(2));
 }

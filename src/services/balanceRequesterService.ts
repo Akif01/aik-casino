@@ -20,6 +20,6 @@ export async function updateBalance(sessionId: string, amount: number) {
         body: JSON.stringify({ sessionId, amount })
     });
 
-    if (!res.ok) throw new Error("Failed to fetch balance");
+    if (!res.ok) throw new Error("Failed to update balance");
     return res.json() as Promise<{ sessionId: string; balance: number }>;
 }

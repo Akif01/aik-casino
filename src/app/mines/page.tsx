@@ -3,8 +3,8 @@
 import style from "./Mines.module.css";
 import { useEffect, useState } from "react";
 import { useSession } from "@/lib/sessionContext";
-import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesService";
-import { getBalance } from "@/services/balanceService";
+import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesRequesterService";
+import { getBalance } from "@/services/balanceRequesterService";
 
 export default function MinesPage() {
 
@@ -154,7 +154,7 @@ export default function MinesPage() {
                         min={balance === 0 ? 0 : 1}
                         max={balance ?? 1} // fallback to 1
                         disabled={gameState === "playing"}
-                        value={betAmount}
+                        value={Math.round(betAmount)}
                         onChange={(e) => {
                             let value = Number(e.target.value);
                             if (value < (balance === 0 ? 0 : 1)) value = (balance === 0 ? 0 : 1);
