@@ -1,6 +1,7 @@
 import { getBalanceBySession, updateBalanceBySession } from "./BalanceService";
 import crypto from "crypto";
 import { GameState } from "@/types/gameState";
+import type { MinesGame } from "@/types/minesGame"
 
 export async function handleStartGame(
     sessionId: string,
@@ -15,7 +16,7 @@ export async function handleStartGame(
     if (gridSize < 5 || gridSize > 10)
         return null;
 
-    if (mineCount < 1 || mineCount > gridSize - 1)
+    if (mineCount < 1 || mineCount > gridSize * gridSize - 1)
         return null;
 
     const mines = new Set<number>();
@@ -47,14 +48,26 @@ export async function handleStartGame(
     return gameId;
 }
 
-export async function handleCellClicked(sessionId: string, gameId: string, cellIndex: number) {
+export async function handleCellClicked(sessionId: string, gameId: string, cellIndex: number):
+    Promise<MinesGame | null> {
+    const currentBalance = balances[sessionId];
+
+    if (!currentBalance)
+        return null;
+
     const game = activeGames[gameId];
 
     if (!game)
-        return;
+        return null;
 
     if (game.state !== GameState.Playing)
-        return;
+        return null;
+
+    if (cellIndex < 0 || cellIndex >= game.size * game.size)
+        return null;
+
+    if (game.revealed.has(cellIndex))
+        return null;
 
     if (game.mines.has(cellIndex)) {
         game.revealed.add(cellIndex);

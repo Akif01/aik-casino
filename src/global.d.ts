@@ -1,16 +1,8 @@
 export { };
 import type { GameState } from "./types/gameState";
+import type { MinesGame } from "./types/minesGame"
+
 declare global {
     var balances: Record<string, number>;
-
-    var activeGames: Record<
-        string,
-        {
-            size: number;
-            mines: Set<number>;
-            revealed: Set<number>;
-            state: GameState;
-            betAmount: number;
-        }
-    >;
+    var activeGames: Record<string, MinesGame>;
 }

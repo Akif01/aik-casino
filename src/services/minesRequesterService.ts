@@ -40,24 +40,26 @@ export async function cashoutMinesGame(sessionId: string, gameId: string)
 
 export async function cellClickedMinesGame(sessionId: string, gameId: string, cellIndex: number): Promise<{
     revealed: number[];
-    state: GameState;
+    gameState: GameState;
     balance: number;
     multiplier: number;
     cashout: number;
-}> {
+    mines: number[];
+} | null> {
     const res = await fetch(clickEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, gameId, cellIndex }),
     });
 
-    const resObj = (await res.json()) as {
+    if (!res) return null;
+
+    return res.json() as Promise<{
         revealed: number[];
-        state: GameState;
+        gameState: GameState;
         balance: number;
         multiplier: number;
         cashout: number;
-    };
-
-    return resObj;
+        mines: number[];
+    }>;
 }

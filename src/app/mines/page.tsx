@@ -83,21 +83,22 @@ export default function MinesPage() {
     async function handleClick(index: number) {
         if (!sessionId || !gameId || gameState !== GameState.Playing) return;
 
-        if (!sessionId) return;
-
         const data = await cellClickedMinesGame(sessionId, gameId, index);
+
+        if (!data) return;
+
         setRevealed(new Set(data.revealed));
 
-        if (data.state === GameState.Lost) {
+        if (data.gameState === GameState.Lost) {
             updateBalanceUI(sessionId);
-            setMines(prev => new Set([...prev, index]));
+            setMines(new Set(data.mines));
         }
 
-        if (data.state === GameState.Won) {
+        if (data.gameState === GameState.Won) {
             updateBalanceUI(sessionId);
         }
 
-        setGameState(data.state);
+        setGameState(data.gameState);
         setMultiplier(data.multiplier);
         setCashout(data.cashout);
 
