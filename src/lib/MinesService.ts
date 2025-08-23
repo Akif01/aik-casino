@@ -127,13 +127,15 @@ export function calculateMultiplier(gridSize: number, mineCount: number, reveale
     const totalCells = gridSize * gridSize;
     const safeCells = totalCells - mineCount;
 
-    if (safeCells <= 0) return 0;
+    if (revealedSafeCells === 0) return 1;
 
-    // Base growth depends on mine density
-    const baseGrowth = 1 + (mineCount / totalCells) * 2;
+    let multiplier = 1;
+    for (let i = 0; i < revealedSafeCells; i++) {
+        multiplier *= (totalCells - i) / (safeCells - i);
+    }
 
-    // Exponential growth with diminishing returns
-    const multiplier = Math.pow(baseGrowth, revealedSafeCells / 2);
+    // Apply a small house edge
+    multiplier *= 0.99;
 
     return parseFloat(multiplier.toFixed(2));
 }
