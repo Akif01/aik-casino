@@ -14,7 +14,10 @@ export default function Navbar() {
 
     return (
         <nav className={styles.navbar}>
-            <span className={styles.navbarHeader}>Aik Casino</span>
+            <span className={styles.navbarHeader}>
+                <span className={styles.navbarHeaderShort}>AC</span>
+                <span className={styles.navbarHeaderFull}>Aik Casino</span>
+            </span>
             {navItems.map((item) => (
                 <Link
                     key={item.href}

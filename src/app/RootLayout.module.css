@@ -37,17 +37,40 @@
 }
 
 .navbarHeader {
+    display: flex;
     padding: 1rem 2rem;
-    text-align: center;
     font-weight: 900;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
     white-space: nowrap;
     overflow: hidden;
-    opacity: 0;
+    justify-content: center;
 }
 
 .navbar:hover .navbarHeader {
     opacity: 1;
+}
+
+.navbarHeaderFull {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.navbarHeaderShort {
+    opacity: 1;
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+.navbar:hover .navbarHeaderFull {
+    opacity: 1;
+    width: auto;
+}
+
+.navbar:hover .navbarHeaderShort {
+    opacity: 0;
+    width: 0;
 }
 
 .navbarItem {
