@@ -1,21 +1,25 @@
 import { getBalanceBySession, updateBalanceBySession } from "./BalanceService";
 import crypto from "crypto";
+import { GameState } from "@/types/gameState";
 
 export async function handleStartGame(
     sessionId: string,
-    size: number,
+    gridSize: number,
     mineCount: number,
-    betAmount: number) {
+    betAmount: number): Promise<string | null> {
     const availableBalance = await getBalanceBySession(sessionId);
 
-    if (!availableBalance || availableBalance < betAmount)
-        return;
+    if (!availableBalance || betAmount <= 0 || availableBalance < betAmount)
+        return null;
 
-    const gridSize = Math.min(Math.max(size, 5), 10);
-    const minesToPlace = Math.min(mineCount, gridSize * gridSize - 1);
+    if (gridSize < 5 || gridSize > 10)
+        return null;
+
+    if (mineCount < 1 || mineCount > gridSize - 1)
+        return null;
 
     const mines = new Set<number>();
-    while (mines.size < minesToPlace) {
+    while (mines.size < mineCount) {
         mines.add(crypto.randomInt(0, gridSize * gridSize));
     }
 
@@ -36,7 +40,7 @@ export async function handleStartGame(
         size: gridSize,
         mines: mines,
         revealed: new Set(),
-        state: "playing",
+        state: GameState.Playing,
         betAmount: betAmount
     };
 
@@ -49,12 +53,12 @@ export async function handleCellClicked(sessionId: string, gameId: string, cellI
     if (!game)
         return;
 
-    if (game.state !== "playing")
+    if (game.state !== GameState.Playing)
         return;
 
     if (game.mines.has(cellIndex)) {
         game.revealed.add(cellIndex);
-        game.state = "lost";
+        game.state = GameState.Lost;
         await updateBalanceBySession(sessionId, -game.betAmount);
         return game;
     }
@@ -68,22 +72,27 @@ export async function handleCellClicked(sessionId: string, gameId: string, cellI
 
     if (revealedSafeCells >= safeCells) {
         await handleCashoutGame(sessionId, gameId);
-        game.state = "won";
+        game.state = GameState.Won;
     }
 
     return game;
 }
 
-export async function handleCashoutGame(sessionId: string, gameId: string) {
+export async function handleCashoutGame(sessionId: string, gameId: string)
+    : Promise<{ cashout: number, gameState: GameState } | null> {
+    if (!sessionId || !gameId) {
+        return null;
+    }
+
     const game = activeGames[gameId];
 
-    if (!game || game.state !== "playing")
-        return;
+    if (!game || game.state !== GameState.Playing)
+        return null;
 
     const availableBalance = await getBalanceBySession(sessionId);
 
     if (!availableBalance || availableBalance < game.betAmount)
-        return;
+        return null;
 
     const cashout = calculateCashout(
         game.betAmount,
@@ -93,9 +102,12 @@ export async function handleCashoutGame(sessionId: string, gameId: string) {
     );
 
     await updateBalanceBySession(sessionId, cashout);
-    game.state = "won";
+    game.state = GameState.Won;
 
-    return cashout;
+    return {
+        cashout,
+        gameState: game.state
+    };
 }
 
 export function calculateMultiplier(gridSize: number, mineCount: number, revealedSafeCells: number) {

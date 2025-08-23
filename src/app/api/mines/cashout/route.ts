@@ -3,16 +3,13 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     const { sessionId, gameId } = await req.json();
-
-    if (!sessionId) {
-        return NextResponse.json({ error: "Invalid session" }, { status: 400 });
+    const result = await handleCashoutGame(sessionId, gameId);
+    if (!result) {
+        return NextResponse.json({ error: "Could not cashout game" }, { status: 400 });
     }
 
-    const cashout = await handleCashoutGame(sessionId, gameId);
-    const game = activeGames[gameId];
-
     return NextResponse.json({
-        cashout: cashout,
-        state: game.state
+        cashout: result.cashout,
+        gameState: result.gameState
     });
 }

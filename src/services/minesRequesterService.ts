@@ -1,3 +1,5 @@
+import { GameState } from "@/types/gameState";
+
 const startEndpoint = "/api/mines/start";
 const clickEndpoint = "/api/mines/click";
 const cashoutEndpoint = "/api/mines/cashout";
@@ -24,15 +26,16 @@ export async function startMinesGame(
     }>;
 }
 
-export async function cashoutMinesGame(sessionId: string, gameId: string) {
+export async function cashoutMinesGame(sessionId: string, gameId: string)
+    : Promise<{ cashout: number, gameState: GameState } | null> {
     const res = await fetch(cashoutEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, gameId }),
     });
 
-    if (!res.ok) throw new Error("Failed to update balance");
-    return res.json() as Promise<{ cashout: number, state: GameState }>;
+    if (!res.ok) return null;
+    return res.json() as Promise<{ cashout: number, gameState: GameState }>;
 }
 
 export async function cellClickedMinesGame(sessionId: string, gameId: string, cellIndex: number): Promise<{

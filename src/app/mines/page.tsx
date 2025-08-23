@@ -5,16 +5,16 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/lib/sessionContext";
 import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesRequesterService";
 import { getBalance } from "@/services/balanceRequesterService";
-
+import { GameState } from "@/types/gameState";
 export default function MinesPage() {
 
     const [gameId, setGameId] = useState<string | null>(null);
     const [revealed, setRevealed] = useState<Set<number>>(new Set());
     const [mines, setMines] = useState<Set<number>>(new Set());
-    const [gameState, setGameState] = useState<GameState>("waiting");
+    const [gameState, setGameState] = useState<GameState>(GameState.Waiting);
 
-    const [pendingGridSize, setPendingGridSize] = useState(5); // editable value
-    const [pendingMineAmount, setPendingMineAmount] = useState(1); // editable value
+    const [pendingGridSize, setPendingGridSize] = useState(5);
+    const [pendingMineAmount, setPendingMineAmount] = useState(1);
 
     const [multiplier, setMultiplier] = useState(0);
     const [cellMultipliers, setCellMultipliers] = useState<Record<number, number>>({});
@@ -27,12 +27,10 @@ export default function MinesPage() {
     useEffect(() => {
         if (balance == null) return;
 
-        // if current bet is higher than balance, reset it
         if (betAmount > balance) {
             setBetAmount(balance);
         }
 
-        // if balance is zero, force bet to zero
         if (balance === 0) {
             setBetAmount(0);
         }
@@ -68,29 +66,34 @@ export default function MinesPage() {
     }
 
     async function cashoutGame() {
-        if (!gameId || gameState !== "playing") return;
+        if (!gameId || gameState !== GameState.Playing) return;
 
         if (!sessionId) return;
 
-        const { cashout, state } = await cashoutMinesGame(sessionId, gameId);
+        const result = await cashoutMinesGame(sessionId, gameId);
+        if (!result) return;
+
+        console.log("Cashout game with result:", result);
+
         updateBalanceUI(sessionId);
-        setGameState(state);
+        setGameState(result.gameState);
+        setCashout(result.cashout);
     }
 
     async function handleClick(index: number) {
-        if (!sessionId || !gameId || gameState !== "playing") return;
+        if (!sessionId || !gameId || gameState !== GameState.Playing) return;
 
         if (!sessionId) return;
 
         const data = await cellClickedMinesGame(sessionId, gameId, index);
         setRevealed(new Set(data.revealed));
 
-        if (data.state === "lost") {
+        if (data.state === GameState.Lost) {
             updateBalanceUI(sessionId);
             setMines(prev => new Set([...prev, index]));
         }
 
-        if (data.state === "won") {
+        if (data.state === GameState.Won) {
             updateBalanceUI(sessionId);
         }
 
@@ -113,7 +116,7 @@ export default function MinesPage() {
                         type="number"
                         min={5}
                         max={10}
-                        disabled={gameState === "playing"}
+                        disabled={gameState === GameState.Playing}
                         value={pendingGridSize}
                         onChange={(e) => {
                             let value = Number(e.target.value);
@@ -132,7 +135,7 @@ export default function MinesPage() {
                         type="number"
                         min={1}
                         max={pendingGridSize * pendingGridSize - 1}
-                        disabled={gameState === "playing"}
+                        disabled={gameState === GameState.Playing}
                         value={pendingMineAmount}
                         onChange={(e) => {
                             let value = Number(e.target.value);
@@ -153,7 +156,7 @@ export default function MinesPage() {
                         style={{ minWidth: "150px", maxWidth: "150px" }}
                         min={balance === 0 ? 0 : 1}
                         max={balance ?? 1} // fallback to 1
-                        disabled={gameState === "playing"}
+                        disabled={gameState === GameState.Playing}
                         value={betAmount}
                         onChange={(e) => {
                             let value = Number(e.target.value);
@@ -167,7 +170,7 @@ export default function MinesPage() {
                 </div>
 
                 <button
-                    disabled={gameState === "playing"}
+                    disabled={gameState === GameState.Playing}
                     onClick={startGame}
                     className={styles.startButton}
                 >
@@ -175,10 +178,10 @@ export default function MinesPage() {
                 </button>
             </div>
 
-            {(gameState === "playing") && (
+            {(gameState === GameState.Playing) && (
                 <>
                     <button
-                        disabled={gameState !== "playing"}
+                        disabled={gameState !== GameState.Playing}
                         onClick={cashoutGame}
                     >
                         Cashout ${cashout}
@@ -189,9 +192,9 @@ export default function MinesPage() {
                 </>
 
             )}
-            {(gameState === "won" || gameState === "lost") && (
+            {(gameState === GameState.Won || gameState === GameState.Lost) && (
                 <div className={styles.winMessage}>
-                    <h2>{gameState === "won" ? "You Win!" : "You hit a mine!"}</h2>
+                    <h2>{gameState === GameState.Won ? `You Win $${cashout}!` : "You hit a mine!"}</h2>
                 </div>
             )}
 
@@ -203,7 +206,7 @@ export default function MinesPage() {
                     <button
                         key={i}
                         onClick={() => handleClick(i)}
-                        disabled={revealed.has(i) || gameState !== "playing"}
+                        disabled={revealed.has(i) || gameState !== GameState.Playing}
                         className={`${styles.gridCell} 
                             ${revealed.has(i) ? styles.gridCellRevealed : ""} 
                             ${mines.has(i) ? styles.gridCellMineRevealed : ""}`}

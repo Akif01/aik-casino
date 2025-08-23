@@ -1,14 +1,8 @@
 export { };
-
-declare global {
-    type GameState = "waiting" | "playing" | "lost" | "won";
-}
-
+import type { GameState } from "./types/gameState";
 declare global {
     var balances: Record<string, number>;
-}
 
-declare global {
     var activeGames: Record<
         string,
         {

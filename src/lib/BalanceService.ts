@@ -1,4 +1,4 @@
-export async function getBalanceBySession(sessionId: string) {
+export async function getBalanceBySession(sessionId: string): Promise<number | null> {
     let balance = global.balances[sessionId];
 
     if (!balance) {
