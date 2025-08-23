@@ -1,6 +1,6 @@
 "use client";
 
-import style from "./Mines.module.css";
+import styles from "./Mines.module.css";
 import { useEffect, useState } from "react";
 import { useSession } from "@/lib/sessionContext";
 import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesRequesterService";
@@ -105,8 +105,8 @@ export default function MinesPage() {
     }
 
     return (
-        <div className={style.mainContent}>
-            <div className={style.gridSettings}>
+        <div className={styles.mainContent}>
+            <div className={styles.gridSettings}>
                 <div className="inputGroup">
                     <input
                         id="gridSizeInput"
@@ -169,7 +169,7 @@ export default function MinesPage() {
                 <button
                     disabled={gameState === "playing"}
                     onClick={startGame}
-                    className={style.startButton}
+                    className={styles.startButton}
                 >
                     Start Game
                 </button>
@@ -190,13 +190,13 @@ export default function MinesPage() {
 
             )}
             {(gameState === "won" || gameState === "lost") && (
-                <div className={style.winMessage}>
+                <div className={styles.winMessage}>
                     <h2>{gameState === "won" ? "You Win!" : "You hit a mine!"}</h2>
                 </div>
             )}
 
             <div
-                className={style.grid}
+                className={styles.grid}
                 style={{ gridTemplateColumns: `repeat(${pendingGridSize}, 100px)` }}
             >
                 {Array.from({ length: pendingGridSize * pendingGridSize }, (_, i) => (
@@ -204,12 +204,12 @@ export default function MinesPage() {
                         key={i}
                         onClick={() => handleClick(i)}
                         disabled={revealed.has(i) || gameState !== "playing"}
-                        className={`${style.gridCell} 
-                            ${revealed.has(i) ? style.gridCellRevealed : ""} 
-                            ${mines.has(i) ? style.gridCellMineRevealed : ""}`}
+                        className={`${styles.gridCell} 
+                            ${revealed.has(i) ? styles.gridCellRevealed : ""} 
+                            ${mines.has(i) ? styles.gridCellMineRevealed : ""}`}
                     >
                         {revealed.has(i) ? (
-                            <span className={style.multiplierText}>{cellMultipliers[i]}x</span>
+                            <span className={styles.multiplierText}>{cellMultipliers[i]}x</span>
                         ) : (
                             "")}
                     </button>
