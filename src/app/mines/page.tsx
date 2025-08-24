@@ -7,6 +7,7 @@ import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/servic
 import { getBalance } from "@/services/balanceRequesterService";
 import { GameState } from "@/types/gameState";
 import CashoutButton from "@/components/CashoutButton";
+import StartGameButton from "@/components/StartGameButton";
 export default function MinesPage() {
 
     const [gameId, setGameId] = useState<string | null>(null);
@@ -167,14 +168,10 @@ export default function MinesPage() {
                     />
                     <label htmlFor="betAmountInput">Bet</label>
                 </div>
-
-                <button
+                <StartGameButton
                     disabled={gameState === GameState.Playing}
-                    onClick={startGame}
-                    className={styles.startButton}
-                >
-                    Start Game
-                </button>
+                    onStartGame={startGame}
+                />
             </div>
 
             {(gameState === GameState.Playing) && (
