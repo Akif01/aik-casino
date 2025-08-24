@@ -9,7 +9,6 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 12px;
-    margin: 1rem;
     box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.4);
     transition: width 0.3s ease;
 }
@@ -75,10 +74,6 @@
     transition: opacity 0.3s ease;
     opacity: 0;
     white-space: nowrap;
-}
-
-.navbar:hover .navbarItem {
-    /* justify-content: flex-start; */
 }
 
 .navbar:hover .navbarItemLabel {
