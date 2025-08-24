@@ -6,7 +6,7 @@ import { useSession } from "@/lib/sessionContext";
 import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesRequesterService";
 import { getBalance } from "@/services/balanceRequesterService";
 import { GameState } from "@/types/gameState";
-import CashoutButton from "@/components/cashoutButton";
+import CashoutButton from "@/components/CashoutButton";
 export default function MinesPage() {
 
     const [gameId, setGameId] = useState<string | null>(null);

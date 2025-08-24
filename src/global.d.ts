@@ -4,5 +4,5 @@ import type { MinesGame } from "./types/minesGame"
 
 declare global {
     var balances: Record<string, number>;
-    var activeGames: Record<string, MinesGame>;
+    var activeMinesGames: Record<string, MinesGame>;
 }

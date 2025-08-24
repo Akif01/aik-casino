@@ -37,7 +37,7 @@ export async function handleStartGame(
 
     const gameId = crypto.randomUUID();
 
-    activeGames[gameId] = {
+    activeMinesGames[gameId] = {
         size: gridSize,
         mines: mines,
         revealed: new Set(),
@@ -55,7 +55,7 @@ export async function handleCellClicked(sessionId: string, gameId: string, cellI
     if (!currentBalance)
         return null;
 
-    const game = activeGames[gameId];
+    const game = activeMinesGames[gameId];
 
     if (!game)
         return null;
@@ -97,7 +97,7 @@ export async function handleCashoutGame(sessionId: string, gameId: string)
         return null;
     }
 
-    const game = activeGames[gameId];
+    const game = activeMinesGames[gameId];
 
     if (!game || game.state !== GameState.Playing)
         return null;

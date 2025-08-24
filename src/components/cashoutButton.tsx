@@ -7,7 +7,7 @@ interface CashoutButtonProps {
     disabled: boolean;
 }
 
-const CashoutButton: React.FC<CashoutButtonProps> = ({ cashoutAmount, onCashout, disabled }) => {
+export default function CashoutButton({ cashoutAmount, onCashout, disabled }: CashoutButtonProps) {
     return (
         <button
             className={styles.cashoutButton}
@@ -17,6 +17,4 @@ const CashoutButton: React.FC<CashoutButtonProps> = ({ cashoutAmount, onCashout,
             Cashout ${cashoutAmount.toFixed(2)}
         </button>
     );
-};
-
-export default CashoutButton;
+}
