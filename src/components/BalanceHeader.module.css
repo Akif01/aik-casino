@@ -1,3 +1,9 @@
 .balance {
     margin-left: auto;
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.4);
+    padding: 1rem;
 }
