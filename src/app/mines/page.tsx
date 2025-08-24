@@ -6,6 +6,7 @@ import { useSession } from "@/lib/sessionContext";
 import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesRequesterService";
 import { getBalance } from "@/services/balanceRequesterService";
 import { GameState } from "@/types/gameState";
+import CashoutButton from "@/components/cashoutButton";
 export default function MinesPage() {
 
     const [gameId, setGameId] = useState<string | null>(null);
@@ -16,7 +17,6 @@ export default function MinesPage() {
     const [pendingGridSize, setPendingGridSize] = useState(5);
     const [pendingMineAmount, setPendingMineAmount] = useState(1);
 
-    const [multiplier, setMultiplier] = useState(0);
     const [cellMultipliers, setCellMultipliers] = useState<Record<number, number>>({});
 
     const [betAmount, setBetAmount] = useState(1);
@@ -55,7 +55,6 @@ export default function MinesPage() {
         setPendingMineAmount(data.mineCount);
         setGameState(data.state);
         setCashout(data.cashout);
-        setMultiplier(data.multiplier);
 
         console.log("Starting game with data:", data);
     }
@@ -99,7 +98,6 @@ export default function MinesPage() {
         }
 
         setGameState(data.gameState);
-        setMultiplier(data.multiplier);
         setCashout(data.cashout);
 
         setCellMultipliers(prev => ({
@@ -180,19 +178,13 @@ export default function MinesPage() {
             </div>
 
             {(gameState === GameState.Playing) && (
-                <>
-                    <button
-                        disabled={gameState !== GameState.Playing}
-                        onClick={cashoutGame}
-                    >
-                        Cashout ${cashout}
-                    </button>
-                    <div>
-                        Multiplier: {multiplier}x
-                    </div>
-                </>
-
+                <CashoutButton
+                    cashoutAmount={cashout}
+                    disabled={gameState !== GameState.Playing}
+                    onCashout={cashoutGame}
+                />
             )}
+
             {(gameState === GameState.Won || gameState === GameState.Lost) && (
                 <div className={styles.winMessage}>
                     <h2>{gameState === GameState.Won ? `You Win $${cashout}!` : "You hit a mine!"}</h2>
