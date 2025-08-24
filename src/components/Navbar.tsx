@@ -7,6 +7,7 @@ const navItems = [
     { icon: "home", label: "Home", href: "/" },
     { icon: "bomb", label: "Mines", href: "/mines" },
     { icon: "castle", label: "Tower", href: "/tower" },
+    { icon: "casino", label: "Dice", href: "/dice" },
 ];
 
 export default function Navbar() {
