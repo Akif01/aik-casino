@@ -79,10 +79,10 @@ export default function DicePage() {
                                 style={{
                                     background: `linear-gradient(
                                         to right,
-                                        white ${(start - min) / (max - min) * 100}%,
+                                        gray ${(start - min) / (max - min) * 100}%,
                                         #0f0 ${(start - min) / (max - min) * 100}%,
                                         #0f0 ${(end - min) / (max - min) * 100}%,
-                                        white ${(end - min) / (max - min) * 100}%
+                                        gray ${(end - min) / (max - min) * 100}%
                                     )`
                                 }}
                             >
