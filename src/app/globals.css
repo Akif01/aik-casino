@@ -63,8 +63,9 @@ input:disabled {
 
 .inputGroup label {
   position: absolute;
+  width: fit-content;
   top: 50%;
-  left: 10px;
+  left: 0px;
   transform: translateY(-50%);
   background: transparent;
   padding: 0 4px;
@@ -72,6 +73,7 @@ input:disabled {
   pointer-events: none;
   transition: 0.2s ease all;
   border: none;
+  text-wrap: nowrap;
 }
 
 /* When input is focused or filled */

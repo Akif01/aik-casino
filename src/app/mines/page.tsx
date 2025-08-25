@@ -169,6 +169,7 @@ export default function MinesPage() {
                     <label htmlFor="betAmountInput">Bet</label>
                 </div>
                 <StartGameButton
+                    text="Start Mines"
                     disabled={gameState === GameState.Playing}
                     onStartGame={startGame}
                 />
