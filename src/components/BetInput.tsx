@@ -15,12 +15,10 @@ export default function BetInput({ disabled, onChange }: BetInputProps) {
 
     useEffect(() => {
         if (balance == null) return;
-        let newBetAmount: number = 0;
+        let newBetAmount = betAmount;
         if (betAmount > balance) {
             newBetAmount = Number(balance.toFixed(2));
-        }
-
-        if (balance === 0) {
+        } else if (balance === 0) {
             newBetAmount = Number(0);
         }
 

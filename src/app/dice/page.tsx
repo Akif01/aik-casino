@@ -27,7 +27,7 @@ export default function DicePage() {
     }, [balance]);
 
     async function rollDice() {
-        if (balance === null || betAmount < 1 || betAmount > balance) return;
+        if (balance === null || betAmount < 0 || betAmount > balance) return;
 
         const data = await roll(sessionId!, guessedDiceNumber, betAmount);
 
@@ -56,6 +56,11 @@ export default function DicePage() {
                 disabled={gameState === GameState.Playing}
                 onChange={(value) => setBetAmount(value)}
             />
+            <div className={styles.resultBox}>
+                <span>Rolled: {rolledDiceNumber ?? "NaN"} </span>
+                <span>Multiplier: {multiplier} </span>
+                <span>Cashout: {cashout}</span>
+            </div>
             <div className={styles.rangeWrapper}>
                 <Range
                     disabled={gameState === GameState.Playing}
@@ -97,12 +102,6 @@ export default function DicePage() {
                 disabled={gameState === GameState.Playing}
                 onStartGame={rollDice}
             />
-
-            <div className={styles.resultBox}>
-                <h2>Rolled: {rolledDiceNumber}</h2>
-                <h2>Multiplier: {multiplier}</h2>
-                <h2>Cashout: {cashout}</h2>
-            </div>
         </div>
     );
 }
