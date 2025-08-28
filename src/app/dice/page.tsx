@@ -5,6 +5,7 @@ import { useSession } from "@/lib/sessionContext";
 import StartGameButton from "@/components/StartGameButton";
 import { Range } from "react-range";
 import styles from "./Dice.module.css";
+import BetInput from "@/components/BetInput";
 
 export default function DicePage() {
     const { balance, setBalanceUI } = useSession();
@@ -43,23 +44,10 @@ export default function DicePage() {
     return (
         <div className={styles.mainContent}>
             <h1 style={{ color: "red" }}>Work in progress, this is not finished!</h1>
-            <div className="inputGroup">
-                <input
-                    id="betAmountInput"
-                    type="number"
-                    min={balance === 0 ? 0 : 1}
-                    max={balance ?? 1}
-                    value={betAmount}
-                    onChange={(e) => {
-                        let value = Number(e.target.value);
-                        if (value < (balance === 0 ? 0 : 1)) value = (balance === 0 ? 0 : 1);
-                        if (value > (balance ?? 0)) value = balance ?? 0;
-                        setBetAmount(value);
-                    }}
-                />
-                <label htmlFor="betAmountInput">Bet Amount</label>
-            </div>
-
+            <BetInput
+                disabled={false}
+                onChange={(value) => setBetAmount(value)}
+            />
             <div className={styles.rangeWrapper}>
                 <Range
                     step={1}
