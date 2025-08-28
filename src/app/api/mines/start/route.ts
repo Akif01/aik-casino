@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         size: game.size,
         mineCount: game.mines.size,
         betAmount,
-        state: "playing",
+        state: game.state,
         multiplier: 0,
         cashout: 0,
     });

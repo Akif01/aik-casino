@@ -6,15 +6,18 @@ import StartGameButton from "@/components/StartGameButton";
 import { Range } from "react-range";
 import styles from "./Dice.module.css";
 import BetInput from "@/components/BetInput";
+import { roll } from "@/services/diceRequesterService";
+import { GameState } from "@/types/gameState";
+import { getBalance } from "@/services/balanceRequesterService";
 
 export default function DicePage() {
-    const { balance, setBalanceUI } = useSession();
-
+    const { sessionId, balance, setBalanceUI } = useSession();
     const [betAmount, setBetAmount] = useState(1);
-    const [targetNumber, setTargetNumber] = useState(50);
-
-    const [rolledNumber, setRolledNumber] = useState<number | null>(null);
-    const [result, setResult] = useState<string | null>(null);
+    const [guessedDiceNumber, setGuessedDiceNumber] = useState(50);
+    const [rolledDiceNumber, setRolledDiceNumber] = useState<number | null>(null);
+    const [cashout, setCashout] = useState<number>(0);
+    const [multiplier, setMultiplier] = useState<number>(0);
+    const [gameState, setGameState] = useState<GameState>(GameState.Waiting);
 
     useEffect(() => {
         if (balance == null) return;
@@ -23,41 +26,47 @@ export default function DicePage() {
         if (balance === 0) setBetAmount(0);
     }, [balance]);
 
-    function rollDice() {
+    async function rollDice() {
         if (balance === null || betAmount < 1 || betAmount > balance) return;
 
-        const roll = Math.floor(Math.random() * 101); // 0–100 inclusive
-        setRolledNumber(roll);
+        const data = await roll(sessionId!, guessedDiceNumber, betAmount);
 
-        // Example logic: win if roll <= targetNumber
-        if (roll !== 0 && roll <= targetNumber) {
-            const probability = (targetNumber + 1) / 101; // chance of winning
-            const payout = betAmount * (1 / probability) * 0.99;
-            setResult(`You Win! Rolled ${roll}. Payout: $${payout.toFixed(2)}`);
-            setBalanceUI(balance + payout - betAmount);
-        } else {
-            setResult(`You Lose. Rolled ${roll}`);
-            setBalanceUI(balance - betAmount);
-        }
+        if (!data)
+            return;
+
+        setRolledDiceNumber(data.rolledDiceNumber);
+        setGuessedDiceNumber(data.guessedDiceNumber);
+        setMultiplier(data.multiplier);
+        setCashout(data.cashout);
+
+        await updateBalanceUI(sessionId!);
+
+        console.log("Rolled game data:", data);
+    }
+
+    async function updateBalanceUI(sessionId: string) {
+        const { balance } = await getBalance(sessionId);
+        setBalanceUI(balance);
     }
 
     return (
         <div className={styles.mainContent}>
             <h1 style={{ color: "red" }}>Work in progress, this is not finished!</h1>
             <BetInput
-                disabled={false}
+                disabled={gameState === GameState.Playing}
                 onChange={(value) => setBetAmount(value)}
             />
             <div className={styles.rangeWrapper}>
                 <Range
+                    disabled={gameState === GameState.Playing}
                     step={1}
                     min={1}
                     max={100}
-                    values={[targetNumber]}
-                    onChange={(values) => setTargetNumber(values[0])}
+                    values={[guessedDiceNumber]}
+                    onChange={(values) => setGuessedDiceNumber(values[0])}
                     renderTrack={({ props, children }) => {
                         const min = 1, max = 100;
-                        const percentage = ((targetNumber - min) / (max - min)) * 100;
+                        const percentage = ((guessedDiceNumber - min) / (max - min)) * 100;
                         return (
                             <div
                                 {...props}
@@ -79,21 +88,21 @@ export default function DicePage() {
                     }}
                 />
                 <div>
-                    Target Number: ≤ {targetNumber}
+                    Target Number: Bigger than 1, equal or smaller than {guessedDiceNumber}
                 </div>
             </div>
 
             <StartGameButton
                 text="Roll Dice"
-                disabled={betAmount < 1 || balance === 0}
+                disabled={gameState === GameState.Playing}
                 onStartGame={rollDice}
             />
 
-            {result && (
-                <div className={styles.resultBox}>
-                    <h2>{result}</h2>
-                </div>
-            )}
+            <div className={styles.resultBox}>
+                <h2>Rolled: {rolledDiceNumber}</h2>
+                <h2>Multiplier: {multiplier}</h2>
+                <h2>Cashout: {cashout}</h2>
+            </div>
         </div>
     );
 }
