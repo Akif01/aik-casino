@@ -8,6 +8,7 @@ import { getBalance } from "@/services/balanceRequesterService";
 import { GameState } from "@/types/gameState";
 import CashoutButton from "@/components/CashoutButton";
 import StartGameButton from "@/components/StartGameButton";
+import BetInput from "@/components/BetInput";
 export default function MinesPage() {
 
     const [gameId, setGameId] = useState<string | null>(null);
@@ -133,7 +134,6 @@ export default function MinesPage() {
                     />
                     <label htmlFor="gridSizeInput">Grid</label>
                 </div>
-
                 <div className="inputGroup">
                     <input
                         id="mineAmountInput"
@@ -153,33 +153,16 @@ export default function MinesPage() {
                     />
                     <label htmlFor="mineAmountInput">Mines</label>
                 </div>
-
-                <div className="inputGroup">
-                    <input
-                        id="betAmountInput"
-                        type="number"
-                        style={{ minWidth: "150px", maxWidth: "150px" }}
-                        min={0}
-                        max={balance ?? 0}
-                        disabled={gameState === GameState.Playing}
-                        value={betAmount}
-                        onChange={(e) => {
-                            let value = Number(e.target.value);
-                            if (value < 0) value = 0;
-                            if (value > (balance ?? 0)) value = balance ?? 0;
-                            setBetAmount(value);
-                        }}
-                        required
-                    />
-                    <label htmlFor="betAmountInput">Bet</label>
-                </div>
+                <BetInput
+                    disabled={gameState === GameState.Playing}
+                    onChange={(value) => setBetAmount(value)}
+                />
                 <StartGameButton
                     text="Start Mines"
                     disabled={gameState === GameState.Playing}
                     onStartGame={startGame}
                 />
             </div>
-
             {(gameState === GameState.Playing) && (
                 <CashoutButton
                     cashoutAmount={cashout}
@@ -187,13 +170,11 @@ export default function MinesPage() {
                     onCashout={cashoutGame}
                 />
             )}
-
             {(gameState === GameState.Won || gameState === GameState.Lost) && (
                 <div className={styles.winMessage}>
                     <h2>{gameState === GameState.Won ? `You Win $${cashout.toFixed(2)}!` : "You hit a mine!"}</h2>
                 </div>
             )}
-
             <div
                 className={styles.grid}
                 style={{ gridTemplateColumns: `repeat(${pendingGridSize}, 100px)` }}
