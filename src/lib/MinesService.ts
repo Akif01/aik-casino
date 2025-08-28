@@ -10,7 +10,7 @@ export async function handleStartGame(
     betAmount: number): Promise<string | null> {
     const availableBalance = await getBalanceBySession(sessionId);
 
-    if (!availableBalance || betAmount <= 0 || availableBalance < betAmount)
+    if (!availableBalance || betAmount < 0 || availableBalance < betAmount)
         return null;
 
     if (gridSize < 5 || gridSize > 10)
@@ -146,7 +146,7 @@ export function calculateCashout(
     mines: number,
     revealedSafeCells: number
 ): number {
-    if (betAmount < 1) return 0;
+    if (betAmount <= 0) return 0;
     const multiplier = calculateMultiplier(gridSize, mines, revealedSafeCells);
     return Number((betAmount * (multiplier - 1)).toFixed(2));
 }

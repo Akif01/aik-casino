@@ -29,7 +29,7 @@ export default function MinesPage() {
         if (balance == null) return;
 
         if (betAmount > balance) {
-            setBetAmount(balance);
+            setBetAmount(Number(balance.toFixed(2)));
         }
 
         if (balance === 0) {
@@ -123,6 +123,11 @@ export default function MinesPage() {
                             if (value < 5) value = 5;
                             if (value > 10) value = 10;
                             setPendingGridSize(value);
+
+                            if (gameState === GameState.Lost || gameState === GameState.Won) {
+                                setRevealed(new Set());
+                                setMines(new Set());
+                            }
                         }}
                         required
                     />
@@ -154,13 +159,13 @@ export default function MinesPage() {
                         id="betAmountInput"
                         type="number"
                         style={{ minWidth: "150px", maxWidth: "150px" }}
-                        min={balance === 0 ? 0 : 1}
-                        max={balance ?? 1} // fallback to 1
+                        min={0}
+                        max={balance ?? 0}
                         disabled={gameState === GameState.Playing}
                         value={betAmount}
                         onChange={(e) => {
                             let value = Number(e.target.value);
-                            if (value < (balance === 0 ? 0 : 1)) value = (balance === 0 ? 0 : 1);
+                            if (value < 0) value = 0;
                             if (value > (balance ?? 0)) value = balance ?? 0;
                             setBetAmount(value);
                         }}
@@ -185,7 +190,7 @@ export default function MinesPage() {
 
             {(gameState === GameState.Won || gameState === GameState.Lost) && (
                 <div className={styles.winMessage}>
-                    <h2>{gameState === GameState.Won ? `You Win $${cashout}!` : "You hit a mine!"}</h2>
+                    <h2>{gameState === GameState.Won ? `You Win $${cashout.toFixed(2)}!` : "You hit a mine!"}</h2>
                 </div>
             )}
 
