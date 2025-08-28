@@ -10,7 +10,7 @@ export default function DicePage() {
     const { balance, setBalanceUI } = useSession();
 
     const [betAmount, setBetAmount] = useState(1);
-    const [range, setRange] = useState<[number, number]>([1, 100]);
+    const [targetNumber, setTargetNumber] = useState(50);
 
     const [rolledNumber, setRolledNumber] = useState<number | null>(null);
     const [result, setResult] = useState<string | null>(null);
@@ -28,11 +28,9 @@ export default function DicePage() {
         const roll = Math.floor(Math.random() * 101); // 0–100 inclusive
         setRolledNumber(roll);
 
-        const [start, end] = range;
-
-        // user can only select 1–100, but dice can roll 0
-        if (roll !== 0 && roll >= start && roll <= end) {
-            const probability = (end - start + 1) / 101; // 101 possible results: 0–100
+        // Example logic: win if roll <= targetNumber
+        if (roll !== 0 && roll <= targetNumber) {
+            const probability = (targetNumber + 1) / 101; // chance of winning
             const payout = betAmount * (1 / probability) * 0.99;
             setResult(`You Win! Rolled ${roll}. Payout: $${payout.toFixed(2)}`);
             setBalanceUI(balance + payout - betAmount);
@@ -65,37 +63,35 @@ export default function DicePage() {
             <div className={styles.rangeWrapper}>
                 <Range
                     step={1}
-                    min={1}   // user can only pick 1–100
+                    min={1}
                     max={100}
-                    values={range}
-                    onChange={(values) => setRange([values[0], values[1]])}
+                    values={[targetNumber]}
+                    onChange={(values) => setTargetNumber(values[0])}
                     renderTrack={({ props, children }) => {
-                        const [min, max] = [1, 100];
-                        const [start, end] = range;
+                        const min = 1, max = 100;
+                        const percentage = ((targetNumber - min) / (max - min)) * 100;
                         return (
                             <div
                                 {...props}
                                 className={styles.track}
                                 style={{
                                     background: `linear-gradient(
-                                        to right,
-                                        gray ${(start - min) / (max - min) * 100}%,
-                                        #0f0 ${(start - min) / (max - min) * 100}%,
-                                        #0f0 ${(end - min) / (max - min) * 100}%,
-                                        gray ${(end - min) / (max - min) * 100}%
-                                    )`
+                                    to right, 
+                                    #0f0 ${percentage}%, 
+                                    red ${percentage}%)`
                                 }}
                             >
                                 {children}
                             </div>
                         );
                     }}
-                    renderThumb={({ props, index }) => (
-                        <div {...props} className={styles.thumb} key={`thumb-${index}`} />
-                    )}
+                    renderThumb={({ props }) => {
+                        const { key, ...restProps } = props;
+                        return <div key={key} {...restProps} className={styles.thumb} />;
+                    }}
                 />
                 <div>
-                    Range: {range[0]} – {range[1]}
+                    Target Number: ≤ {targetNumber}
                 </div>
             </div>
 
