@@ -4,18 +4,30 @@ const startEndpoint = "/api/mines/start";
 const clickEndpoint = "/api/mines/click";
 const cashoutEndpoint = "/api/mines/cashout";
 
+// helper to wrap fetch with error handling
+async function safeFetch<T>(url: string, options: RequestInit): Promise<T> {
+    try {
+        const res = await fetch(url, options);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Request failed (${res.status}): ${errorText}`);
+        }
+
+        return res.json() as Promise<T>;
+    } catch (err) {
+        console.error("Fetch error:", err);
+        throw err; // always throw so frontend can catch
+    }
+}
+
 export async function startMinesGame(
     sessionId: string,
     size: number,
     mineCount: number,
-    betAmount: number) {
-    const res = await fetch(startEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, size, mineCount, betAmount }),
-    });
-    if (!res.ok) throw new Error("Failed to start game");
-    return res.json() as Promise<{
+    betAmount: number
+) {
+    return safeFetch<{
         gameId: string,
         size: number,
         mineCount: number,
@@ -23,43 +35,35 @@ export async function startMinesGame(
         state: GameState,
         multiplier: number,
         cashout: number
-    }>;
-}
-
-export async function cashoutMinesGame(sessionId: string, gameId: string)
-    : Promise<{ cashout: number, gameState: GameState } | null> {
-    const res = await fetch(cashoutEndpoint, {
+    }>(startEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, gameId }),
+        body: JSON.stringify({ sessionId, size, mineCount, betAmount }),
     });
-
-    if (!res.ok) return null;
-    return res.json() as Promise<{ cashout: number, gameState: GameState }>;
 }
 
-export async function cellClickedMinesGame(sessionId: string, gameId: string, cellIndex: number): Promise<{
-    revealed: number[];
-    gameState: GameState;
-    balance: number;
-    multiplier: number;
-    cashout: number;
-    mines: number[];
-} | null> {
-    const res = await fetch(clickEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, gameId, cellIndex }),
-    });
+export async function cashoutMinesGame(sessionId: string, gameId: string) {
+    return safeFetch<{ cashout: number, gameState: GameState }>(
+        cashoutEndpoint,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId, gameId }),
+        }
+    );
+}
 
-    if (!res) return null;
-
-    return res.json() as Promise<{
+export async function cellClickedMinesGame(sessionId: string, gameId: string, cellIndex: number) {
+    return safeFetch<{
         revealed: number[];
         gameState: GameState;
         balance: number;
         multiplier: number;
         cashout: number;
         mines: number[];
-    }>;
+    }>(clickEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, gameId, cellIndex }),
+    });
 }

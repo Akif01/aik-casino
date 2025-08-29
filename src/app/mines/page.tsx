@@ -39,26 +39,31 @@ export default function MinesPage() {
     }, [balance]);
 
     async function startGame() {
-        setRevealed(new Set());
-        setMines(new Set());
+        if (!sessionId) return;
+        if (gameState === GameState.Playing) return;
 
-        const data = await startMinesGame(
-            sessionId!,
-            pendingGridSize,
-            pendingMineAmount,
-            betAmount
-        );
+        try {
+            setRevealed(new Set());
+            setMines(new Set());
 
-        if (!data)
-            return;
+            const data = await startMinesGame(
+                sessionId,
+                pendingGridSize,
+                pendingMineAmount,
+                betAmount
+            );
 
-        setGameId(data.gameId);
-        setPendingGridSize(data.size);
-        setPendingMineAmount(data.mineCount);
-        setGameState(data.state);
-        setCashout(data.cashout);
+            setGameId(data.gameId);
+            setPendingGridSize(data.size);
+            setPendingMineAmount(data.mineCount);
+            setGameState(data.state);
+            setCashout(data.cashout);
 
-        console.log("Starting game with data:", data);
+            console.log("Starting game with data:", data);
+        } catch (err) {
+            console.error("Failed to start game:", err);
+            alert("Could not start game. Please try again.");
+        }
     }
 
     async function updateBalanceUI(sessionId: string) {
@@ -68,44 +73,50 @@ export default function MinesPage() {
 
     async function cashoutGame() {
         if (!gameId || gameState !== GameState.Playing) return;
-
         if (!sessionId) return;
 
-        const result = await cashoutMinesGame(sessionId, gameId);
-        if (!result) return;
+        try {
+            const result = await cashoutMinesGame(sessionId, gameId);
 
-        console.log("Cashout game with result:", result);
+            updateBalanceUI(sessionId);
+            setGameState(result.gameState);
+            setCashout(result.cashout);
 
-        updateBalanceUI(sessionId);
-        setGameState(result.gameState);
-        setCashout(result.cashout);
+            console.log("Cashout game with result:", result);
+        } catch (err) {
+            console.error("Cashout failed:", err);
+            alert("Cashout failed. Please try again.");
+        }
     }
 
     async function handleClick(index: number) {
         if (!sessionId || !gameId || gameState !== GameState.Playing) return;
 
-        const data = await cellClickedMinesGame(sessionId, gameId, index);
+        try {
+            const data = await cellClickedMinesGame(sessionId, gameId, index);
 
-        if (!data) return;
+            setRevealed(new Set(data.revealed));
 
-        setRevealed(new Set(data.revealed));
+            if (data.gameState === GameState.Lost) {
+                updateBalanceUI(sessionId);
+                setMines(new Set(data.mines));
+            }
 
-        if (data.gameState === GameState.Lost) {
-            updateBalanceUI(sessionId);
-            setMines(new Set(data.mines));
+            if (data.gameState === GameState.Won) {
+                updateBalanceUI(sessionId);
+            }
+
+            setGameState(data.gameState);
+            setCashout(data.cashout);
+
+            setCellMultipliers(prev => ({
+                ...prev,
+                [index]: data.multiplier,
+            }));
+        } catch (err) {
+            console.error("Click failed:", err);
+            alert("Something went wrong. Please try again.");
         }
-
-        if (data.gameState === GameState.Won) {
-            updateBalanceUI(sessionId);
-        }
-
-        setGameState(data.gameState);
-        setCashout(data.cashout);
-
-        setCellMultipliers(prev => ({
-            ...prev,
-            [index]: data.multiplier,
-        }));
     }
 
     return (
@@ -171,8 +182,12 @@ export default function MinesPage() {
                 />
             )}
             {(gameState === GameState.Won || gameState === GameState.Lost) && (
-                <div className={styles.winMessage}>
-                    <h2>{gameState === GameState.Won ? `You Win $${cashout.toFixed(2)}!` : "You hit a mine!"}</h2>
+                <div>
+                    <span className={gameState === GameState.Won ? styles.wonText : styles.lostText}>
+                        {gameState === GameState.Won
+                            ? `You Win $${cashout.toFixed(2)}!`
+                            : "You hit a mine!"}
+                    </span>
                 </div>
             )}
             <div

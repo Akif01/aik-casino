@@ -56,6 +56,22 @@
     font-weight: 700;
 }
 
+.lostText {
+    color: red;
+}
+
+.wonText {
+    color: #0f0;
+}
+
+.wonText,
+.lostText {
+    display: flex;
+    animation: flyDown 0.6s ease-out forwards;
+    font-size: 1.4rem;
+    font-weight: 900;
+}
+
 @keyframes flyDown {
     from {
         transform: translateY(-40px) scale(1.5);
