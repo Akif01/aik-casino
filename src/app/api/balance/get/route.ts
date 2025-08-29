@@ -9,6 +9,10 @@ export async function POST(req: Request) {
 
     const balance = await getBalanceBySession(sessionId);
 
+    if (!balance) {
+        return NextResponse.json({ error: "Could not get balance" }, { status: 400 });
+    }
+
     return NextResponse.json({
         sessionId,
         balance: balance,

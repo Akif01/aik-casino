@@ -10,6 +10,13 @@ export async function getBalanceBySession(sessionId: string): Promise<number | n
 }
 
 export async function updateBalanceBySession(sessionId: string, amount: number) {
-    global.balances[sessionId] += amount;
-    return global.balances[sessionId];
+    let balance = global.balances[sessionId];
+
+    if (!balance)
+        return null;
+
+    balance += amount;
+    global.balances[sessionId] = balance;
+
+    return balance;
 }

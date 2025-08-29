@@ -9,6 +9,9 @@ export async function POST(req: Request) {
 
     const balance = updateBalanceBySession(sessionId, amount);
 
+    if (!balance)
+        return NextResponse.json({ error: "Could not update balance" }, { status: 400 });
+
     return NextResponse.json({
         sessionId,
         balance: balance,
