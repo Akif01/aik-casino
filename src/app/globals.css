@@ -116,3 +116,15 @@ input:disabled {
     background-position: 0% 50%;
   }
 }
+
+@keyframes flyDown {
+  from {
+    transform: translateY(-40px) scale(1.5);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
