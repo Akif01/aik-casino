@@ -1,25 +1,9 @@
 import { GameState } from "@/types/gameState";
+import { safeFetch } from "./requesterHelper";
 
 const startEndpoint = "/api/mines/start";
 const clickEndpoint = "/api/mines/click";
 const cashoutEndpoint = "/api/mines/cashout";
-
-// helper to wrap fetch with error handling
-async function safeFetch<T>(url: string, options: RequestInit): Promise<T> {
-    try {
-        const res = await fetch(url, options);
-
-        if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`Request failed (${res.status}): ${errorText}`);
-        }
-
-        return res.json() as Promise<T>;
-    } catch (err) {
-        console.error("Fetch error:", err);
-        throw err; // always throw so frontend can catch
-    }
-}
 
 export async function startMinesGame(
     sessionId: string,

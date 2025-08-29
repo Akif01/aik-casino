@@ -1,25 +1,20 @@
-export async function getBalance(sessionId: string) {
-    const url = "/api/balance/get";
+import { safeFetch } from "./requesterHelper";
 
-    const res = await fetch(url, {
+const getBlanaceEndpoint = "/api/balance/get";
+const updateBalanceEndpoint = "/api/balance/update";
+
+export async function getBalance(sessionId: string) {
+    return safeFetch<{ sessionId: string; balance: number }>(getBlanaceEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId })
     });
-
-    if (!res.ok) throw new Error("Failed to fetch balance");
-    return res.json() as Promise<{ sessionId: string; balance: number }>;
 }
 
 export async function updateBalance(sessionId: string, amount: number) {
-    const url = "/api/balance/update";
-
-    const res = await fetch(url, {
+    return safeFetch<{ sessionId: string; balance: number }>(updateBalanceEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, amount })
     });
-
-    if (!res.ok) throw new Error("Failed to update balance");
-    return res.json() as Promise<{ sessionId: string; balance: number }>;
 }
