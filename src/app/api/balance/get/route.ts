@@ -14,7 +14,6 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({
-        sessionId,
-        balance: balance,
+        balance,
     });
 }
