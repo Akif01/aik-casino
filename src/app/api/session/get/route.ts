@@ -1,3 +1,4 @@
+import { initBalanceBySession } from "@/lib/BalanceService";
 import { getSessionIdCookie } from "@/lib/CookieHelper";
 import { generateNewSession } from "@/lib/SessionService";
 import { NextResponse } from "next/server";
@@ -7,6 +8,7 @@ export async function GET(req: Request) {
 
     if (existingSessionId) {
         console.debug("api/session/get: sessionId exists:", existingSessionId);
+        initBalanceBySession(existingSessionId);
         return NextResponse.json({});
     }
 
