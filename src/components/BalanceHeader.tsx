@@ -4,7 +4,7 @@ import style from "./BalanceHeader.module.css"
 import { useSession } from "@/lib/sessionContext";
 
 export default function BalanceHeader() {
-    const { sessionId, balance, setBalanceUI } = useSession();
+    const { balance, setBalanceUI } = useSession();
 
     return (
         <div className={style.balance}>

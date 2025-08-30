@@ -1,52 +1,39 @@
 "use client";
-import { getSessionId } from "@/services/sessionRequesterService";
+
 import { getBalance } from "@/services/balanceRequesterService";
+import { initSession } from "@/services/sessionRequesterService";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface SessionContextType {
-    sessionId: string | null;
-    setSessionId: (id: string) => void;
     balance: number | null;
     setBalanceUI: (balance: number) => void;
 }
 
 const SessionContext = createContext<SessionContextType>({
-    sessionId: null,
-    setSessionId: () => { },
     balance: null,
     setBalanceUI: () => { },
 });
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-    const [sessionId, setSessionId] = useState<string | null>(null);
     const [balance, setBalanceUI] = useState<number | null>(null);
 
     useEffect(() => {
-        const initSession = async () => {
-            let storedSession = localStorage.getItem("sessionId");
-
-            if (!storedSession) {
-                const { sessionId } = await getSessionId();
-                localStorage.setItem("sessionId", sessionId);
-                setSessionId(sessionId);
-
-                // fetch initial balance
-                const { balance } = await getBalance(sessionId);
-                setBalanceUI(balance);
-            } else {
-                setSessionId(storedSession);
-
-                // fetch balance for stored session
-                const data = await getBalance(storedSession);
+        const fetchBalance = async () => {
+            try {
+                // The cookie is automatically sent, no sessionId required
+                await initSession();
+                const data = await getBalance();
                 setBalanceUI(data.balance);
+            } catch (err) {
+                console.error("Failed to fetch balance", err);
             }
         };
 
-        initSession();
+        fetchBalance();
     }, []);
 
     return (
-        <SessionContext.Provider value={{ sessionId, setSessionId, balance, setBalanceUI: setBalanceUI }}>
+        <SessionContext.Provider value={{ balance, setBalanceUI }}>
             {children}
         </SessionContext.Provider>
     );

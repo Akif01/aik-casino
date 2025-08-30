@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { handleStartGame } from "@/lib/MinesService";
+import { getSessionIdCookie } from "@/lib/CookieHelper";
 
 export async function POST(req: Request) {
-    const { sessionId, size = 5, mineCount = 5, betAmount = 0 } = await req.json();
+    const sessionId = await getSessionIdCookie(req);
+    if (!sessionId) {
+        return NextResponse.json(
+            { error: "Session not provided" },
+            { status: 400 }
+        );
+    }
+
+    const { size = 5, mineCount = 5, betAmount = 0 } = await req.json();
 
     const gameId = await handleStartGame(sessionId, size, mineCount, betAmount);
     if (!gameId) {

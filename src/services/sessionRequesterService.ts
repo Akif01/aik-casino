@@ -1,11 +1,10 @@
-export async function getSessionId() {
+export async function initSession() {
     const url = "/api/session/get";
 
     const res = await fetch(url, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
     });
 
     if (!res.ok) throw new Error("Failed to get sessionId");
-    return res.json() as Promise<{ sessionId: string; }>;
 }

@@ -1,11 +1,13 @@
 import { getBalanceBySession } from "@/lib/BalanceService";
+import { getSessionIdCookie } from "@/lib/CookieHelper";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-    const { sessionId } = await req.json();
+export async function GET(req: Request) {
+    const sessionId = await getSessionIdCookie(req);
 
-    if (!sessionId)
+    if (!sessionId) {
         return NextResponse.json({ error: "No session provided" }, { status: 400 });
+    }
 
     const balance = await getBalanceBySession(sessionId);
 

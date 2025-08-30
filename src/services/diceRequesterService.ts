@@ -3,13 +3,13 @@ import { GameState } from "@/types/gameState";
 const rollEndpoint = "/api/dice/roll";
 
 export async function roll(
-    sessionId: string,
     guessedDiceNumber: number,
     betAmount: number) {
     const res = await fetch(rollEndpoint, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, guessedDiceNumber, betAmount }),
+        body: JSON.stringify({ guessedDiceNumber, betAmount }),
     });
 
     if (!res.ok) throw new Error("Failed to roll dice");
