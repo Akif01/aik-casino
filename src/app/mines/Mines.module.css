@@ -9,7 +9,7 @@
 
 .gridSettings {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
     align-items: baseline;
     width: 100%;
     flex-wrap: wrap;
