@@ -24,7 +24,7 @@ export default function MinesPage() {
     const [betAmount, setBetAmount] = useState(1);
     const [cashout, setCashout] = useState(0);
 
-    const { sessionId, balance, setBalanceUI } = useSession();
+    const { balance, setBalanceUI } = useSession();
 
     useEffect(() => {
         if (balance == null) return;
@@ -39,7 +39,6 @@ export default function MinesPage() {
     }, [balance]);
 
     async function startGame() {
-        if (!sessionId) return;
         if (gameState === GameState.Playing) return;
 
         try {
@@ -47,7 +46,6 @@ export default function MinesPage() {
             setMines(new Set());
 
             const data = await startMinesGame(
-                sessionId,
                 pendingGridSize,
                 pendingMineAmount,
                 betAmount
@@ -66,19 +64,18 @@ export default function MinesPage() {
         }
     }
 
-    async function updateBalanceUI(sessionId: string) {
-        const { balance } = await getBalance(sessionId);
+    async function updateBalanceUI() {
+        const { balance } = await getBalance();
         setBalanceUI(balance);
     }
 
     async function cashoutGame() {
         if (!gameId || gameState !== GameState.Playing) return;
-        if (!sessionId) return;
 
         try {
-            const result = await cashoutMinesGame(sessionId, gameId);
+            const result = await cashoutMinesGame(gameId);
 
-            updateBalanceUI(sessionId);
+            updateBalanceUI();
             setGameState(result.gameState);
             setCashout(result.cashout);
 
@@ -90,20 +87,20 @@ export default function MinesPage() {
     }
 
     async function handleClick(index: number) {
-        if (!sessionId || !gameId || gameState !== GameState.Playing) return;
+        if (!gameId || gameState !== GameState.Playing) return;
 
         try {
-            const data = await cellClickedMinesGame(sessionId, gameId, index);
+            const data = await cellClickedMinesGame(gameId, index);
 
             setRevealed(new Set(data.revealed));
 
             if (data.gameState === GameState.Lost) {
-                updateBalanceUI(sessionId);
+                updateBalanceUI();
                 setMines(new Set(data.mines));
             }
 
             if (data.gameState === GameState.Won) {
-                updateBalanceUI(sessionId);
+                updateBalanceUI();
             }
 
             setGameState(data.gameState);

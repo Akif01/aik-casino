@@ -11,7 +11,7 @@ import { GameState } from "@/types/gameState";
 import { getBalance } from "@/services/balanceRequesterService";
 
 export default function DicePage() {
-    const { sessionId, balance, setBalanceUI } = useSession();
+    const { balance, setBalanceUI } = useSession();
     const [betAmount, setBetAmount] = useState(1);
     const [guessedDiceNumber, setGuessedDiceNumber] = useState(50);
     const [rolledDiceNumber, setRolledDiceNumber] = useState<number | null>(null);
@@ -29,7 +29,7 @@ export default function DicePage() {
     async function rollDice() {
         if (balance === null || betAmount < 0 || betAmount > balance) return;
 
-        const data = await roll(sessionId!, guessedDiceNumber, betAmount);
+        const data = await roll(guessedDiceNumber, betAmount);
 
         if (!data)
             return;
@@ -39,13 +39,13 @@ export default function DicePage() {
         setMultiplier(data.multiplier);
         setCashout(data.cashout);
 
-        await updateBalanceUI(sessionId!);
+        await updateBalanceUI();
 
         console.log("Rolled game data:", data);
     }
 
-    async function updateBalanceUI(sessionId: string) {
-        const { balance } = await getBalance(sessionId);
+    async function updateBalanceUI() {
+        const { balance } = await getBalance();
         setBalanceUI(balance);
     }
 

@@ -6,7 +6,6 @@ const clickEndpoint = "/api/mines/click";
 const cashoutEndpoint = "/api/mines/cashout";
 
 export async function startMinesGame(
-    sessionId: string,
     size: number,
     mineCount: number,
     betAmount: number
@@ -21,23 +20,25 @@ export async function startMinesGame(
         cashout: number
     }>(startEndpoint, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, size, mineCount, betAmount }),
+        body: JSON.stringify({ size, mineCount, betAmount }),
     });
 }
 
-export async function cashoutMinesGame(sessionId: string, gameId: string) {
+export async function cashoutMinesGame(gameId: string) {
     return safeFetch<{ cashout: number, gameState: GameState }>(
         cashoutEndpoint,
         {
             method: "POST",
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ sessionId, gameId }),
+            body: JSON.stringify({ gameId }),
         }
     );
 }
 
-export async function cellClickedMinesGame(sessionId: string, gameId: string, cellIndex: number) {
+export async function cellClickedMinesGame(gameId: string, cellIndex: number) {
     return safeFetch<{
         revealed: number[];
         gameState: GameState;
@@ -47,7 +48,8 @@ export async function cellClickedMinesGame(sessionId: string, gameId: string, ce
         mines: number[];
     }>(clickEndpoint, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, gameId, cellIndex }),
+        body: JSON.stringify({ gameId, cellIndex }),
     });
 }
