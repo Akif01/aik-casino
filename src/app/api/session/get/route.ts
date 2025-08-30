@@ -5,10 +5,13 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
     const existingSessionId = await getSessionIdCookie(req);
 
-    if (existingSessionId)
+    if (existingSessionId) {
+        console.debug("api/session/get: sessionId exists:", existingSessionId);
         return NextResponse.json({});
+    }
 
     const newSessionId = await generateNewSession();
+    console.debug("api/session/get: sessionId does NOT exist, created a new one:", newSessionId);
     const response = NextResponse.json({});
     response.cookies.set({
         name: "sessionId",

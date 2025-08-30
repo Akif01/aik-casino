@@ -19,5 +19,8 @@ export async function updateBalanceBySession(sessionId: string, amount: number) 
 export async function initBalanceBySession(sessionId: string) {
     if (!(sessionId in global.balances)) {
         global.balances[sessionId] = 100;
+        console.debug("initBalanceBySession: balance does not exist, creating one");
     }
+    else
+        console.debug("initBalanceBySession: balance exists");
 }
