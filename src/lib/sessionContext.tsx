@@ -33,14 +33,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
                 // fetch initial balance
                 const { balance } = await getBalance(sessionId);
                 setBalanceUI(balance);
-                console.log("Balance:", balance);
             } else {
                 setSessionId(storedSession);
 
                 // fetch balance for stored session
                 const data = await getBalance(storedSession);
                 setBalanceUI(data.balance);
-                console.log("Balance:", data.balance);
             }
         };
 
