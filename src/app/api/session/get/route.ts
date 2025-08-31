@@ -1,10 +1,9 @@
 import { initBalanceBySession } from "@/lib/BalanceService";
-import { getSessionIdCookie } from "@/lib/CookieHelper";
 import { generateNewSession } from "@/lib/SessionService";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-    const existingSessionId = await getSessionIdCookie(req);
+export async function GET(req: NextRequest) {
+    const existingSessionId = req.cookies.get("sessionId")?.value;
 
     if (existingSessionId) {
         console.debug("api/session/get: sessionId exists:", existingSessionId);

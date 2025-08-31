@@ -1,19 +1,10 @@
-import { getSessionIdCookie } from "@/lib/CookieHelper";
 import { roll } from "@/lib/DiceService";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const sessionId = await getSessionIdCookie(req);
-
-    if (!sessionId) {
-        return NextResponse.json(
-            { error: "Session not provided" },
-            { status: 400 }
-        );
-    }
-
+    const sessionId = req.headers.get("x-internal-session-id");
     const { guessedDiceNumber, betAmount = 0 } = await req.json();
-    const gameId = await roll(sessionId, guessedDiceNumber, betAmount);
+    const gameId = await roll(sessionId!, guessedDiceNumber, betAmount);
 
     if (!gameId) {
         return NextResponse.json(
