@@ -10,7 +10,10 @@ export async function handleStartGame(
     betAmount: number): Promise<string | null> {
     const availableBalance = await getBalanceBySession(sessionId);
 
-    if (!availableBalance || betAmount < 0 || availableBalance < betAmount)
+    if (availableBalance === null ||
+        availableBalance === undefined ||
+        betAmount < 0 ||
+        availableBalance < betAmount)
         return null;
 
     if (gridSize < 5 || gridSize > 10)
@@ -52,7 +55,7 @@ export async function handleCellClicked(sessionId: string, gameId: string, cellI
     Promise<MinesGame | null> {
     const currentBalance = balances[sessionId];
 
-    if (!currentBalance)
+    if (currentBalance === null || currentBalance === undefined)
         return null;
 
     const game = activeMinesGames[gameId];
@@ -104,7 +107,7 @@ export async function handleCashoutGame(sessionId: string, gameId: string)
 
     const availableBalance = await getBalanceBySession(sessionId);
 
-    if (!availableBalance || availableBalance < game.betAmount)
+    if (availableBalance === null || availableBalance === undefined || availableBalance < game.betAmount)
         return null;
 
     const cashout = calculateCashout(
