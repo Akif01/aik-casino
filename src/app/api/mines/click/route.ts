@@ -1,19 +1,11 @@
-import { getSessionIdCookie } from "@/lib/CookieHelper";
 import { calculateCashout, calculateMultiplier, handleCellClicked } from "@/lib/MinesService";
 import { GameState } from "@/types/gameState";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const sessionId = await getSessionIdCookie(req);
-    if (!sessionId) {
-        return NextResponse.json(
-            { error: "Session not provided" },
-            { status: 400 }
-        );
-    }
-
+    const sessionId = req.headers.get("x-internal-session-id");
     const { gameId, cellIndex } = await req.json();
-    const game = await handleCellClicked(sessionId, gameId, cellIndex);
+    const game = await handleCellClicked(sessionId!, gameId, cellIndex);
 
     if (!game) {
         return NextResponse.json(
