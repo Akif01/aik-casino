@@ -1,14 +1,13 @@
 export async function getBalanceBySession(sessionId: string): Promise<number | null> {
     const balance = global.balances[sessionId];
-    if (!balance) return null;
+    if (balance === undefined || balance === null) return null;
 
     return balance;
 }
 
 export async function updateBalanceBySession(sessionId: string, amount: number) {
     let balance = global.balances[sessionId];
-
-    if (!balance) return null;
+    if (balance === undefined || balance === null) return null;
 
     balance += amount;
     global.balances[sessionId] = balance;
