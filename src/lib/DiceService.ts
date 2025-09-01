@@ -13,7 +13,7 @@ export async function roll(
     if (!availableBalance || betAmount < 0 || availableBalance < betAmount)
         return null;
 
-    if (guessedDiceNumber < 1 || guessedDiceNumber > 100)
+    if (guessedDiceNumber < 0 || guessedDiceNumber > 99)
         return null;
 
     const gameId = crypto.randomUUID();

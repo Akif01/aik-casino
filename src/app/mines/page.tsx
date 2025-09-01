@@ -11,6 +11,8 @@ import StartGameButton from "@/components/StartGameButton";
 import BetInput from "@/components/BetInput";
 export default function MinesPage() {
 
+    const { balance, setBalanceUI } = useSession();
+
     const [gameId, setGameId] = useState<string | null>(null);
     const [revealed, setRevealed] = useState<Set<number>>(new Set());
     const [mines, setMines] = useState<Set<number>>(new Set());
@@ -23,8 +25,6 @@ export default function MinesPage() {
 
     const [betAmount, setBetAmount] = useState(1);
     const [cashout, setCashout] = useState(0);
-
-    const { balance, setBalanceUI } = useSession();
 
     useEffect(() => {
         if (balance == null) return;
@@ -119,7 +119,7 @@ export default function MinesPage() {
 
             setCellMultipliers(prev => ({
                 ...prev,
-                [index]: data.multiplier,
+                [index]: Number(data.multiplier.toFixed(2)),
             }));
         } catch (err) {
             console.error("Click failed:", err);
@@ -164,7 +164,7 @@ export default function MinesPage() {
 
     return (
         <div className={styles.mainContent}>
-            <div className={styles.gridSettings}>
+            <div className="gameSettings">
                 <div className="inputGroup">
                     <input
                         id="gridSizeInput"
@@ -200,16 +200,14 @@ export default function MinesPage() {
                     disabled={gameState === GameState.Playing}
                     onStartGame={startGame}
                 />
-            </div>
-            {(gameState === GameState.Playing) && (
                 <CashoutButton
                     cashoutAmount={cashout}
                     disabled={gameState !== GameState.Playing}
                     onCashout={cashoutGame}
                 />
-            )}
+            </div>
             {(gameState === GameState.Won || gameState === GameState.Lost) && (
-                <div>
+                <div className="resultBox">
                     <span className={gameState === GameState.Won ? styles.wonText : styles.lostText}>
                         {gameState === GameState.Won
                             ? `You Win $${cashout.toFixed(2)}!`

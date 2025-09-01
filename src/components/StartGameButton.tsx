@@ -25,7 +25,7 @@ export default function CashoutButton({ text, onStartGame, disabled }: StartGame
             onClick={onClicked}
             disabled={disabled || isLoading}
         >
-            {isLoading ? "Loading..." : text}
+            {text}
         </button>
     );
 }

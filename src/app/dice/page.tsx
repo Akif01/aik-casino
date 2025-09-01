@@ -12,6 +12,7 @@ import { getBalance } from "@/services/balanceRequesterService";
 
 export default function DicePage() {
     const { balance, setBalanceUI } = useSession();
+
     const [betAmount, setBetAmount] = useState(1);
     const [guessedDiceNumber, setGuessedDiceNumber] = useState(50);
     const [rolledDiceNumber, setRolledDiceNumber] = useState<number | null>(null);
@@ -29,19 +30,26 @@ export default function DicePage() {
     async function rollDice() {
         if (balance === null || betAmount < 0 || betAmount > balance) return;
 
-        const data = await roll(guessedDiceNumber, betAmount);
+        try {
+            const data = await roll(guessedDiceNumber, betAmount);
 
-        if (!data)
-            return;
+            if (!data)
+                return;
 
-        setRolledDiceNumber(data.rolledDiceNumber);
-        setGuessedDiceNumber(data.guessedDiceNumber);
-        setMultiplier(data.multiplier);
-        setCashout(data.cashout);
+            setGameState(data.state);
+            setRolledDiceNumber(data.rolledDiceNumber);
+            setGuessedDiceNumber(data.guessedDiceNumber);
+            setMultiplier(Number(data.multiplier.toFixed(2)));
+            setCashout(Number(data.cashout.toFixed(2)));
 
-        await updateBalanceUI();
+            await updateBalanceUI();
 
-        console.log("Rolled game data:", data);
+            console.log("Rolled game data:", data);
+        }
+        catch (err) {
+            console.error("Failed to roll :", err);
+            alert("Could not roll. Please try again.");
+        }
     }
 
     async function updateBalanceUI() {
@@ -51,15 +59,27 @@ export default function DicePage() {
 
     return (
         <div className={styles.mainContent}>
-            <h1 style={{ color: "red" }}>Work in progress, this is not finished!</h1>
-            <BetInput
-                disabled={gameState === GameState.Playing}
-                onChange={(value) => setBetAmount(value)}
-            />
-            <div className={styles.resultBox}>
-                <span>Rolled: {rolledDiceNumber ?? "NaN"} </span>
-                <span>Multiplier: {multiplier} </span>
-                <span>Cashout: {cashout}</span>
+            <div className="gameSettings">
+                <BetInput
+                    disabled={gameState === GameState.Playing}
+                    onChange={(value) => setBetAmount(value)}
+                />
+                <StartGameButton
+                    text="Roll Dice"
+                    disabled={gameState === GameState.Playing}
+                    onStartGame={rollDice}
+                />
+            </div>
+            <div className={styles.resultWrapper}>
+                <div className="resultBox">
+                    <span>Rolled: {rolledDiceNumber ?? "---"} </span>
+                </div>
+                <div className="resultBox">
+                    <span>Multiplier: {multiplier}x </span>
+                </div>
+                <div className="resultBox">
+                    <span>Cashout: ${cashout}</span>
+                </div>
             </div>
             <div className={styles.rangeWrapper}>
                 <Range
@@ -70,7 +90,7 @@ export default function DicePage() {
                     values={[guessedDiceNumber]}
                     onChange={(values) => setGuessedDiceNumber(values[0])}
                     renderTrack={({ props, children }) => {
-                        const min = 1, max = 100;
+                        const min = 0, max = 99;
                         const percentage = ((guessedDiceNumber - min) / (max - min)) * 100;
                         return (
                             <div
@@ -92,16 +112,7 @@ export default function DicePage() {
                         return <div key={key} {...restProps} className={styles.thumb} />;
                     }}
                 />
-                <div>
-                    Target Number: Bigger than 1, equal or smaller than {guessedDiceNumber}
-                </div>
             </div>
-
-            <StartGameButton
-                text="Roll Dice"
-                disabled={gameState === GameState.Playing}
-                onStartGame={rollDice}
-            />
         </div>
     );
 }

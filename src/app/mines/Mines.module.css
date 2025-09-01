@@ -7,15 +7,6 @@
     margin-right: auto;
 }
 
-.gridSettings {
-    display: flex;
-    gap: 1rem;
-    align-items: baseline;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
 .grid {
     display: grid;
     grid-template-columns: repeat(5, 100px);
