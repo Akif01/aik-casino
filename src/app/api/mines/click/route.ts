@@ -16,7 +16,6 @@ export async function POST(req: Request) {
 
     if (game.state === GameState.Lost) {
         return NextResponse.json({
-            result: "mine",
             revealed: Array.from(game.revealed),
             gameState: game.state,
             multiplier: 0,
@@ -30,7 +29,6 @@ export async function POST(req: Request) {
     const cashout = calculateCashout(game.betAmount, game.size, game.mines.size, game.revealed.size);
 
     return NextResponse.json({
-        result: "safe",
         revealed: Array.from(game.revealed),
         gameState: game.state,
         multiplier,
