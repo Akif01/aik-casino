@@ -140,7 +140,7 @@ export function calculateMultiplier(gridSize: number, mineCount: number, reveale
     // Apply a small house edge
     multiplier *= 0.99;
 
-    return parseFloat(multiplier.toFixed(2));
+    return multiplier;
 }
 
 export function calculateCashout(
@@ -151,5 +151,5 @@ export function calculateCashout(
 ): number {
     if (betAmount <= 0) return 0;
     const multiplier = calculateMultiplier(gridSize, mines, revealedSafeCells);
-    return Number((betAmount * (multiplier - 1)).toFixed(2));
+    return (betAmount * (multiplier - 1));
 }

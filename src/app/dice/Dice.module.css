@@ -31,10 +31,7 @@
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
-.resultBox {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: rgba(26, 26, 26, 0.4);
-    border-radius: 8px;
-    text-align: center;
+.resultWrapper {
+    display: flex;
+    gap: 1rem;
 }
