@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./Mines.module.css";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "@/lib/sessionContext";
 import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesRequesterService";
 import { getBalance } from "@/services/balanceRequesterService";
@@ -38,12 +38,23 @@ export default function MinesPage() {
         }
     }, [balance]);
 
+    const resetRevealedAndMines = () => {
+        setRevealed(new Set());
+        setMines(new Set());
+    };
+
+    useEffect(() => {
+        const maxMines = pendingGridSize * pendingGridSize - 1;
+        if (pendingMineAmount > maxMines) {
+            setPendingMineAmount(maxMines);
+        }
+    }, [pendingGridSize, pendingMineAmount]);
+
     async function startGame() {
         if (gameState === GameState.Playing) return;
 
         try {
-            setRevealed(new Set());
-            setMines(new Set());
+            resetRevealedAndMines();
 
             const data = await startMinesGame(
                 pendingGridSize,
@@ -116,6 +127,41 @@ export default function MinesPage() {
         }
     }
 
+    const handleGridChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = Math.min(10, Math.max(5, Number(e.target.value)));
+        setPendingGridSize(value);
+        if (gameState === GameState.Lost || gameState === GameState.Won) {
+            resetRevealedAndMines();
+        }
+    }, [gameState]);
+
+    const handleMineAmountChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            let value = Number(e.target.value);
+            if (value < 1) value = 1;
+            const maxMines = pendingGridSize * pendingGridSize - 1;
+            if (value > maxMines) value = maxMines;
+            setPendingMineAmount(value);
+        }, [pendingGridSize]);
+
+    const grid = useMemo(() => {
+        const cells = Array.from({ length: pendingGridSize * pendingGridSize }, (_, i) => (
+            <button
+                key={i}
+                onClick={() => handleClick(i)}
+                disabled={revealed.has(i) || gameState !== GameState.Playing}
+                className={`${styles.gridCell} 
+                ${revealed.has(i) ? styles.gridCellRevealed : ""} 
+                ${mines.has(i) ? styles.gridCellMineRevealed : ""}`}
+            >
+                {revealed.has(i) ? (
+                    <span className={styles.multiplierText}>{cellMultipliers[i]}x</span>
+                ) : ("")}
+            </button>
+        ));
+        return cells;
+    }, [pendingGridSize, revealed, mines, gameState, cellMultipliers]);
+
     return (
         <div className={styles.mainContent}>
             <div className={styles.gridSettings}>
@@ -127,17 +173,7 @@ export default function MinesPage() {
                         max={10}
                         disabled={gameState === GameState.Playing}
                         value={pendingGridSize}
-                        onChange={(e) => {
-                            let value = Number(e.target.value);
-                            if (value < 5) value = 5;
-                            if (value > 10) value = 10;
-                            setPendingGridSize(value);
-
-                            if (gameState === GameState.Lost || gameState === GameState.Won) {
-                                setRevealed(new Set());
-                                setMines(new Set());
-                            }
-                        }}
+                        onChange={handleGridChange}
                         required
                     />
                     <label htmlFor="gridSizeInput">Grid</label>
@@ -150,13 +186,7 @@ export default function MinesPage() {
                         max={pendingGridSize * pendingGridSize - 1}
                         disabled={gameState === GameState.Playing}
                         value={pendingMineAmount}
-                        onChange={(e) => {
-                            let value = Number(e.target.value);
-                            if (value < 1) value = 1;
-                            if (value > pendingGridSize * pendingGridSize - 1)
-                                value = pendingGridSize * pendingGridSize - 1;
-                            setPendingMineAmount(value);
-                        }}
+                        onChange={handleMineAmountChange}
                         required
                     />
                     <label htmlFor="mineAmountInput">Mines</label>
@@ -191,21 +221,7 @@ export default function MinesPage() {
                 className={styles.grid}
                 style={{ gridTemplateColumns: `repeat(${pendingGridSize}, 100px)` }}
             >
-                {Array.from({ length: pendingGridSize * pendingGridSize }, (_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => handleClick(i)}
-                        disabled={revealed.has(i) || gameState !== GameState.Playing}
-                        className={`${styles.gridCell} 
-                            ${revealed.has(i) ? styles.gridCellRevealed : ""} 
-                            ${mines.has(i) ? styles.gridCellMineRevealed : ""}`}
-                    >
-                        {revealed.has(i) ? (
-                            <span className={styles.multiplierText}>{cellMultipliers[i]}x</span>
-                        ) : (
-                            "")}
-                    </button>
-                ))}
+                {grid}
             </div>
         </div>
     );
