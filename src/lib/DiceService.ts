@@ -10,7 +10,10 @@ export async function roll(
 
     const availableBalance = await getBalanceBySession(sessionId);
 
-    if (!availableBalance || betAmount < 0 || availableBalance < betAmount)
+    if (availableBalance === undefined ||
+        availableBalance === null ||
+        betAmount < 0 ||
+        availableBalance < betAmount)
         return null;
 
     if (guessedDiceNumber < 0 || guessedDiceNumber > 99)

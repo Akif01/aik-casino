@@ -43,11 +43,8 @@ export default function DicePage() {
             setCashout(Number(data.cashout.toFixed(2)));
 
             await updateBalanceUI();
-
-            console.log("Rolled game data:", data);
         }
         catch (err) {
-            console.error("Failed to roll :", err);
             alert("Could not roll. Please try again.");
         }
     }
@@ -72,6 +69,9 @@ export default function DicePage() {
             </div>
             <div className={styles.resultWrapper}>
                 <div className="resultBox">
+                    <span>Guess: ≤ {guessedDiceNumber} </span>
+                </div>
+                <div className="resultBox">
                     <span>Rolled: {rolledDiceNumber ?? "---"} </span>
                 </div>
                 <div className="resultBox">
@@ -85,12 +85,12 @@ export default function DicePage() {
                 <Range
                     disabled={gameState === GameState.Playing}
                     step={1}
-                    min={1}
-                    max={100}
+                    min={0}
+                    max={99}
                     values={[guessedDiceNumber]}
                     onChange={(values) => setGuessedDiceNumber(values[0])}
                     renderTrack={({ props, children }) => {
-                        const min = 0, max = 99;
+                        const min = 0, max = 100;
                         const percentage = ((guessedDiceNumber - min) / (max - min)) * 100;
                         return (
                             <div

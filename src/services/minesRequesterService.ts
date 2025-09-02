@@ -1,16 +1,16 @@
 import { GameState } from "@/types/gameState";
-import { safeFetch } from "./requesterHelper";
+import { fetchOrThrow } from "./requesterHelper";
 
-const startEndpoint = "/api/mines/start";
-const clickEndpoint = "/api/mines/click";
-const cashoutEndpoint = "/api/mines/cashout";
+const START_URL = "/api/mines/start";
+const CLICK_URL = "/api/mines/click";
+const CASHOUT_URL = "/api/mines/cashout";
 
 export async function startMinesGame(
     size: number,
     mineCount: number,
     betAmount: number
 ) {
-    return safeFetch<{
+    return fetchOrThrow<{
         gameId: string,
         size: number,
         mineCount: number,
@@ -18,7 +18,7 @@ export async function startMinesGame(
         state: GameState,
         multiplier: number,
         cashout: number
-    }>(startEndpoint, {
+    }>(START_URL, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -27,8 +27,8 @@ export async function startMinesGame(
 }
 
 export async function cashoutMinesGame(gameId: string) {
-    return safeFetch<{ cashout: number, gameState: GameState }>(
-        cashoutEndpoint,
+    return fetchOrThrow<{ cashout: number, gameState: GameState }>(
+        CASHOUT_URL,
         {
             method: "POST",
             credentials: "include",
@@ -39,14 +39,14 @@ export async function cashoutMinesGame(gameId: string) {
 }
 
 export async function cellClickedMinesGame(gameId: string, cellIndex: number) {
-    return safeFetch<{
+    return fetchOrThrow<{
         revealed: number[];
         gameState: GameState;
         balance: number;
         multiplier: number;
         cashout: number;
         mines: number[];
-    }>(clickEndpoint, {
+    }>(CLICK_URL, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

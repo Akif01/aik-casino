@@ -1,10 +1,10 @@
-export async function initSession() {
-    const url = "/api/session/get";
+import { fetchOrThrow } from "./requesterHelper";
 
-    const res = await fetch(url, {
+const SESSION_URL = "/api/session/get";
+
+export async function initSession() {
+    return fetchOrThrow<{}>(SESSION_URL, {
         method: "GET",
         credentials: "include",
     });
-
-    if (!res.ok) throw new Error("Failed to get sessionId");
 }

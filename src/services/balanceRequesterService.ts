@@ -1,9 +1,9 @@
-import { safeFetch } from "./requesterHelper";
+import { fetchOrThrow } from "./requesterHelper";
 
-const getBlanaceEndpoint = "/api/balance/get";
+const GET_BALANCE_URL = "/api/balance/get";
 
 export async function getBalance() {
-    return safeFetch<{ balance: number }>(getBlanaceEndpoint, {
+    return fetchOrThrow<{ balance: number }>(GET_BALANCE_URL, {
         method: "GET",
         credentials: "include",
     });
