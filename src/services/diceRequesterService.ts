@@ -1,20 +1,12 @@
 import { GameState } from "@/types/gameState";
+import { fetchOrThrow } from "./requesterHelper";
 
-const rollEndpoint = "/api/dice/roll";
+const ROLL_URL = "/api/dice/roll";
 
 export async function roll(
     guessedDiceNumber: number,
     betAmount: number) {
-    const res = await fetch(rollEndpoint, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ guessedDiceNumber, betAmount }),
-    });
-
-    if (!res.ok) throw new Error("Failed to roll dice");
-
-    return res.json() as Promise<{
+    return fetchOrThrow<{
         gameId: string,
         betAmount: number,
         state: GameState,
@@ -22,5 +14,9 @@ export async function roll(
         cashout: number,
         rolledDiceNumber: number,
         guessedDiceNumber: number,
-    }>;
+    }>(ROLL_URL, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({ guessedDiceNumber, betAmount }),
+    });
 }
