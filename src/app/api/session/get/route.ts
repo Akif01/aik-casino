@@ -6,13 +6,11 @@ export async function GET(req: NextRequest) {
     const existingSessionId = req.cookies.get("sessionId")?.value;
 
     if (existingSessionId) {
-        console.debug("api/session/get: sessionId exists:", existingSessionId);
         initBalanceBySession(existingSessionId);
         return NextResponse.json({});
     }
 
     const newSessionId = await generateNewSession();
-    console.debug("api/session/get: sessionId does NOT exist, created a new one:", newSessionId);
     const response = NextResponse.json({});
     response.cookies.set({
         name: "sessionId",

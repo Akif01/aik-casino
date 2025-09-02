@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./StartGameButton.module.css"
 
-interface StartGameButtonProps {
+type StartGameButtonProps = {
     text: string;
     onStartGame: () => Promise<void> | void;
     disabled: boolean;

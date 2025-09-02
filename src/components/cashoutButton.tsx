@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./CashoutButton.module.css"
 
-interface CashoutButtonProps {
+type CashoutButtonProps = {
     cashoutAmount: number;
     onCashout: () => void;
     disabled: boolean;
