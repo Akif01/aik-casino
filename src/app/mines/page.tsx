@@ -68,9 +68,7 @@ export default function MinesPage() {
             setGameState(data.state);
             setCashout(data.cashout);
 
-            console.log("Starting game with data:", data);
         } catch (err) {
-            console.error("Failed to start game:", err);
             alert("Could not start game. Please try again.");
         }
     }
@@ -89,10 +87,7 @@ export default function MinesPage() {
             updateBalanceUI();
             setGameState(result.gameState);
             setCashout(result.cashout);
-
-            console.log("Cashout game with result:", result);
         } catch (err) {
-            console.error("Cashout failed:", err);
             alert("Cashout failed. Please try again.");
         }
     }
@@ -122,7 +117,6 @@ export default function MinesPage() {
                 [index]: Number(data.multiplier.toFixed(2)),
             }));
         } catch (err) {
-            console.error("Click failed:", err);
             alert("Something went wrong. Please try again.");
         }
     }

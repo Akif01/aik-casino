@@ -35,9 +35,6 @@ export async function handleStartGame(
         }
     }
 
-    console.log("Safe spots at:", safeSpots);
-    console.log("Mine spots at:", [...mines]);
-
     const gameId = crypto.randomUUID();
 
     activeMinesGames[gameId] = {

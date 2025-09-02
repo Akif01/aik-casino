@@ -4,7 +4,7 @@ import { getBalance } from "@/services/balanceRequesterService";
 import { initSession } from "@/services/sessionRequesterService";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-interface SessionContextType {
+type SessionContextType = {
     balance: number | null;
     setBalanceUI: (balance: number) => void;
 }
@@ -25,7 +25,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
                 const data = await getBalance();
                 setBalanceUI(data.balance);
             } catch (err) {
-                console.error("Failed to fetch balance", err);
             }
         };
 

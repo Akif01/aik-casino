@@ -4,13 +4,13 @@ import { useSession } from "@/lib/sessionContext";
 import { useEffect, useState } from "react";
 
 
-interface BetInputProps {
+type BetInputProps = {
     disabled: boolean;
     onChange?: (value: number) => void;
 }
 
 export default function BetInput({ disabled, onChange }: BetInputProps) {
-    const { sessionId, balance, setBalanceUI } = useSession();
+    const { balance, setBalanceUI } = useSession();
     const [betAmount, setBetAmount] = useState(1);
 
     useEffect(() => {
