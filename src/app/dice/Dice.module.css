@@ -8,18 +8,31 @@
 }
 
 .rangeWrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
     width: 300px;
+    gap: 0.25rem;
+}
+
+.rangeLabels {
+    position: relative;
+    width: 100%;
+    height: 30px;
+}
+
+.tick {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(-50%);
+    text-align: center;
 }
 
 .track {
-    width: 100%;
-    height: 8px;
-    background-color: #d1d5db;
-    border-radius: 8px;
     display: flex;
+    width: calc(100% - 10px);
+    height: 8px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
@@ -29,6 +42,21 @@
     background-color: white;
     border-radius: 50%;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.rolledNumberTick {
+    font-size: 1.2rem;
+    font-weight: 900;
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.4);
+    padding: 0.5rem;
+}
+
+.lostTick {
+    color: red;
 }
 
 .resultWrapper {

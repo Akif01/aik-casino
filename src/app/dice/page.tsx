@@ -103,6 +103,23 @@ export default function DicePage() {
                 </div>
             )}
             <div className={styles.rangeWrapper}>
+                <div className={styles.rangeLabels}>
+                    <div className={styles.tick}>
+                        <span>0</span>
+                    </div>
+                    <div className={styles.tick} style={{ left: '50%' }}>
+                        <span>50</span>
+                    </div>
+                    <div className={styles.tick} style={{ left: '100%' }}>
+                        <span>100</span>
+                    </div>
+                    {rolledDiceNumber !== null && (
+                        <div className={styles.tick} style={{ left: `${(rolledDiceNumber)}%` }}>
+                            <span className={`${styles.rolledNumberTick} ${gameState === GameState.Lost ? styles.lostTick : ""}`}>{rolledDiceNumber}</span>
+                        </div>
+                    )}
+                </div>
+
                 <Range
                     disabled={gameState === GameState.Playing}
                     step={1}
@@ -119,9 +136,9 @@ export default function DicePage() {
                                 className={styles.track}
                                 style={{
                                     background: `linear-gradient(
-                                    to right, 
-                                    #0f0 ${percentage}%, 
-                                    red ${percentage}%)`
+                            to right, 
+                            #0f0 ${percentage}%, 
+                            red ${percentage}%)`
                                 }}
                             >
                                 {children}
@@ -134,6 +151,7 @@ export default function DicePage() {
                     }}
                 />
             </div>
+
         </div>
     );
 }
