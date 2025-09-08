@@ -39,8 +39,8 @@ export default function DicePage() {
             setGameState(data.state);
             setRolledDiceNumber(data.rolledDiceNumber);
             setGuessedDiceNumber(data.guessedDiceNumber);
-            setMultiplier(Number(data.multiplier.toFixed(2)));
-            setCashout(Number(data.cashout.toFixed(2)));
+            setMultiplier(data.multiplier);
+            setCashout(data.cashout);
 
             await updateBalanceUI();
         }
@@ -75,10 +75,10 @@ export default function DicePage() {
                     <span>Rolled: {rolledDiceNumber ?? "---"} </span>
                 </div>
                 <div className="resultBox">
-                    <span>Multiplier: {multiplier}x </span>
+                    <span>Multiplier: {multiplier?.toFixed(2) ?? "---"}x </span>
                 </div>
                 <div className="resultBox">
-                    <span>Cashout: ${cashout}</span>
+                    <span>Cashout: ${cashout?.toFixed(2) ?? "---"}</span>
                 </div>
             </div>
             <div className={styles.rangeWrapper}>
