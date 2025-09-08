@@ -27,6 +27,10 @@ export default function DicePage() {
         if (balance === 0) setBetAmount(0);
     }, [balance]);
 
+    useEffect(() => {
+        setMultiplier(calculateMultiplier(guessedDiceNumber));
+    }, [guessedDiceNumber]);
+
     async function rollDice() {
         if (balance === null || betAmount < 0 || betAmount > balance) return;
 
@@ -52,6 +56,14 @@ export default function DicePage() {
     async function updateBalanceUI() {
         const { balance } = await getBalance();
         setBalanceUI(balance);
+    }
+
+    function calculateMultiplier(guess: number): number {
+        const probability = (guess + 1) / 101;
+        const houseEdge = 0.99;
+
+        const rawMultiplier = (1 / probability) * houseEdge;
+        return Math.max(rawMultiplier, 1.01); // keep consistent with backend
     }
 
     return (
@@ -81,6 +93,15 @@ export default function DicePage() {
                     <span>Cashout: ${cashout?.toFixed(2) ?? "---"}</span>
                 </div>
             </div>
+            {(gameState === GameState.Won || gameState === GameState.Lost) && (
+                <div className="resultBox">
+                    <span className={gameState === GameState.Won ? styles.wonText : styles.lostText}>
+                        {gameState === GameState.Won
+                            ? `You Win $${cashout.toFixed(2)}!`
+                            : "You lost!"}
+                    </span>
+                </div>
+            )}
             <div className={styles.rangeWrapper}>
                 <Range
                     disabled={gameState === GameState.Playing}
