@@ -1,4 +1,4 @@
-import { getBalanceBySession, updateBalanceBySession } from "./BalanceService";
+import { getBalanceBySession, tryUpdateBalance } from "./BalanceService";
 import crypto from "crypto";
 import { GameState } from "@/types/gameState";
 import type { MinesGame } from "@/types/minesGame"
@@ -50,7 +50,7 @@ export async function handleStartGame(
 
 export async function handleCellClicked(sessionId: string, gameId: string, cellIndex: number):
     Promise<MinesGame | null> {
-    const currentBalance = balances[sessionId];
+    const currentBalance = getBalanceBySession(sessionId);
 
     if (currentBalance === null || currentBalance === undefined)
         return null;
@@ -72,7 +72,7 @@ export async function handleCellClicked(sessionId: string, gameId: string, cellI
     if (game.mines.has(cellIndex)) {
         game.revealed.add(cellIndex);
         game.state = GameState.Lost;
-        await updateBalanceBySession(sessionId, -game.betAmount);
+        const updatedBalance = await tryUpdateBalance(sessionId, game.betAmount, 0);
         return game;
     }
 
@@ -102,11 +102,6 @@ export async function handleCashoutGame(sessionId: string, gameId: string)
     if (!game || game.state !== GameState.Playing)
         return null;
 
-    const availableBalance = await getBalanceBySession(sessionId);
-
-    if (availableBalance === null || availableBalance === undefined || availableBalance < game.betAmount)
-        return null;
-
     const cashout = calculateCashout(
         game.betAmount,
         game.size,
@@ -114,7 +109,10 @@ export async function handleCashoutGame(sessionId: string, gameId: string)
         game.revealed.size
     );
 
-    await updateBalanceBySession(sessionId, cashout);
+    const updatedBalanace = await tryUpdateBalance(sessionId, game.betAmount, cashout);
+    if (updatedBalanace === null) {
+        return null; // insufficient balance
+    }
     game.state = GameState.Won;
 
     return {
