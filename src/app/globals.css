@@ -129,6 +129,10 @@ input:disabled {
   }
 }
 
+.flyDown {
+  animation: flyDown 0.3s ease forwards;
+}
+
 .gameSettings {
   display: flex;
   gap: 1rem;
