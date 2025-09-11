@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     if (balance === undefined || balance === null) {
         return NextResponse.json(
             { error: "Could not get balance" },
-            { status: 400 });
+            { status: 404 });
     }
 
     return NextResponse.json({

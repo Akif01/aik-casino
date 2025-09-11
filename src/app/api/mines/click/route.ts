@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     if (!game) {
         return NextResponse.json(
             { error: "Game not found or already finished" },
-            { status: 400 }
+            { status: 404 }
         );
     }
 
