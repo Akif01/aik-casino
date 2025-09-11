@@ -17,6 +17,7 @@ export default function DicePage() {
     const [guessedDiceNumber, setGuessedDiceNumber] = useState(50);
     const [rolledDiceNumber, setRolledDiceNumber] = useState<number | null>(null);
     const [cashout, setCashout] = useState<number>(0);
+    const [calcCashout, setCalcCashout] = useState<number>(0);
     const [multiplier, setMultiplier] = useState<number>(0);
     const [gameState, setGameState] = useState<GameState>(GameState.Waiting);
 
@@ -28,8 +29,13 @@ export default function DicePage() {
     }, [balance]);
 
     useEffect(() => {
-        setMultiplier(calculateMultiplier(guessedDiceNumber));
-    }, [guessedDiceNumber]);
+        const newMultiplier = calculateMultiplier(guessedDiceNumber);
+        setMultiplier(newMultiplier);
+
+        const profit = betAmount * (newMultiplier - 1);
+        setCalcCashout(profit);
+    }, [guessedDiceNumber, betAmount]);
+
 
     async function rollDice() {
         if (balance === null || betAmount < 0 || betAmount > balance) return;
@@ -90,7 +96,7 @@ export default function DicePage() {
                     <span>Multiplier: {multiplier?.toFixed(2) ?? "---"}x </span>
                 </div>
                 <div className="resultBox">
-                    <span>Cashout: ${cashout?.toFixed(2) ?? "---"}</span>
+                    <span>Cashout: ${calcCashout?.toFixed(2) ?? "---"}</span>
                 </div>
             </div>
             {(gameState === GameState.Won || gameState === GameState.Lost) && (
