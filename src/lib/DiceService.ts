@@ -39,7 +39,7 @@ export async function roll(
         }
     }
 
-    activeDiceGames[gameId] = {
+    diceGames[gameId] = {
         betAmount,
         guessedDiceNumber,
         rolledDiceNumber,

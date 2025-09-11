@@ -1,4 +1,4 @@
-import { calculateCashout, calculateMultiplier, handleCellClicked } from "@/lib/MinesService";
+import { handleCellClicked } from "@/lib/MinesService";
 import { GameState } from "@/types/gameState";
 import { NextResponse } from "next/server";
 
@@ -25,13 +25,8 @@ export async function POST(req: Request) {
         });
     }
 
-    const multiplier = calculateMultiplier(game.size, game.mines.size, game.revealed.size);
-    const cashout = calculateCashout(game.betAmount, game.size, game.mines.size, game.revealed.size);
-
     return NextResponse.json({
         revealed: Array.from(game.revealed),
         gameState: game.state,
-        multiplier,
-        cashout,
     });
 }

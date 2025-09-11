@@ -6,8 +6,8 @@ import styles from "./Navbar.module.css";
 const navItems = [
     { icon: "home", label: "Home", href: "/" },
     { icon: "bomb", label: "Mines", href: "/mines" },
-    { icon: "castle", label: "Tower", href: "/tower" },
     { icon: "casino", label: "Dice", href: "/dice" },
+    { icon: "castle", label: "Tower", href: "/tower" },
 ];
 
 export default function Navbar() {
