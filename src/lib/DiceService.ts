@@ -29,7 +29,7 @@ export async function roll(
 
     let cashout = 0;
     if (gameState === GameState.Won && betAmount > 0) {
-        cashout = betAmount * multiplier; // full payout on win
+        cashout = betAmount * (multiplier - 1); // profit only
     }
 
     if (betAmount > 0) {
