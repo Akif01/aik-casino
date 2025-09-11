@@ -1,5 +1,5 @@
-if (!global.activeDiceGames) {
-    global.activeDiceGames = {};
+if (!global.diceGames) {
+    global.diceGames = {};
 }
 
-export default global.activeDiceGames;
+export default global.diceGames;

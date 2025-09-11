@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const game = activeDiceGames[gameId];
+    const game = diceGames[gameId];
     return NextResponse.json({
         gameId,
         betAmount,

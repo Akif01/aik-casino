@@ -4,6 +4,7 @@ import { fetchOrThrow } from "./requesterHelper";
 const START_URL = "/api/mines/start";
 const CLICK_URL = "/api/mines/click";
 const CASHOUT_URL = "/api/mines/cashout";
+const LAST_ACTIVE_MINES_GAME_URL = "/api/mines/lastActiveGame";
 
 export async function startMinesGame(
     size: number,
@@ -43,13 +44,26 @@ export async function cellClickedMinesGame(gameId: string, cellIndex: number) {
         revealed: number[];
         gameState: GameState;
         balance: number;
-        multiplier: number;
-        cashout: number;
         mines: number[];
     }>(CLICK_URL, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ gameId, cellIndex }),
+    });
+}
+
+export async function getLastActiveMinesGame() {
+    return fetchOrThrow<{
+        sessionId: string,
+        gameId: string,
+        size: number,
+        mineCount: number,
+        revealed: number[],
+        betAmount: number,
+        state: GameState,
+    }>(LAST_ACTIVE_MINES_GAME_URL, {
+        method: "GET",
+        credentials: "include",
     });
 }

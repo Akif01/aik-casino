@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const game = activeMinesGames[gameId];
+    const game = minesGames[gameId];
 
     return NextResponse.json({
         gameId,

@@ -37,7 +37,8 @@ export async function handleStartGame(
 
     const gameId = crypto.randomUUID();
 
-    activeMinesGames[gameId] = {
+    minesGames[gameId] = {
+        sessionId: sessionId,
         size: gridSize,
         mines: mines,
         revealed: new Set(),
@@ -55,7 +56,7 @@ export async function handleCellClicked(sessionId: string, gameId: string, cellI
     if (currentBalance === null || currentBalance === undefined)
         return null;
 
-    const game = activeMinesGames[gameId];
+    const game = minesGames[gameId];
 
     if (!game)
         return null;
@@ -97,7 +98,7 @@ export async function handleCashoutGame(sessionId: string, gameId: string)
         return null;
     }
 
-    const game = activeMinesGames[gameId];
+    const game = minesGames[gameId];
 
     if (!game || game.state !== GameState.Playing)
         return null;
@@ -121,7 +122,7 @@ export async function handleCashoutGame(sessionId: string, gameId: string)
     };
 }
 
-export function calculateMultiplier(gridSize: number, mineCount: number, revealedSafeCells: number) {
+function calculateMultiplier(gridSize: number, mineCount: number, revealedSafeCells: number) {
     const totalCells = gridSize * gridSize;
     const safeCells = totalCells - mineCount;
 
@@ -138,7 +139,7 @@ export function calculateMultiplier(gridSize: number, mineCount: number, reveale
     return multiplier;
 }
 
-export function calculateCashout(
+function calculateCashout(
     betAmount: number,
     gridSize: number,
     mines: number,
@@ -147,4 +148,11 @@ export function calculateCashout(
     if (betAmount <= 0) return 0;
     const multiplier = calculateMultiplier(gridSize, mines, revealedSafeCells);
     return (betAmount * (multiplier - 1));
+}
+
+export async function getLastActiveMinesGameEntry(sessionId: string): Promise<[string, MinesGame] | null> {
+    const entry = Object.entries(minesGames).find(
+        ([_, game]) => game.sessionId === sessionId && game.state === GameState.Playing
+    );
+    return entry ?? null;
 }

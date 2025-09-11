@@ -3,15 +3,13 @@
 import styles from "./Mines.module.css";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "@/lib/sessionContext";
-import { cashoutMinesGame, cellClickedMinesGame, startMinesGame } from "@/services/minesRequesterService";
+import { cashoutMinesGame, cellClickedMinesGame, getLastActiveMinesGame, startMinesGame } from "@/services/minesRequesterService";
 import { getBalance } from "@/services/balanceRequesterService";
 import { GameState } from "@/types/gameState";
 import CashoutButton from "@/components/CashoutButton";
 import StartGameButton from "@/components/StartGameButton";
 import BetInput from "@/components/BetInput";
 export default function MinesPage() {
-
-    const { balance, setBalanceUI } = useSession();
 
     const [gameId, setGameId] = useState<string | null>(null);
     const [revealed, setRevealed] = useState<Set<number>>(new Set());
@@ -25,6 +23,57 @@ export default function MinesPage() {
 
     const [betAmount, setBetAmount] = useState(1);
     const [cashout, setCashout] = useState(0);
+
+    const { balance, setBalanceUI } = useSession();
+
+    useEffect(() => {
+        async function fetchLastActiveGame() {
+            try {
+                const lastActiveMinesGame = await getLastActiveMinesGame();
+                if (!lastActiveMinesGame) return;
+                console.debug("Restoring last active mines game:", lastActiveMinesGame);
+                const cashout = calculateCashout(
+                    lastActiveMinesGame.betAmount,
+                    lastActiveMinesGame.size,
+                    lastActiveMinesGame.mineCount,
+                    lastActiveMinesGame.revealed.length)
+
+                setCellMultipliers(
+                    rebuildCellMultipliers(
+                        lastActiveMinesGame.size,
+                        lastActiveMinesGame.mineCount,
+                        lastActiveMinesGame.revealed
+                    )
+                );
+                setCashout(cashout);
+                setGameId(lastActiveMinesGame.gameId);
+                setPendingGridSize(lastActiveMinesGame.size);
+                setPendingMineAmount(lastActiveMinesGame.mineCount);
+                setRevealed(new Set(lastActiveMinesGame.revealed));
+                setBetAmount(lastActiveMinesGame.betAmount);
+                setGameState(lastActiveMinesGame.state);
+
+
+            } catch (err) {
+            }
+        }
+        fetchLastActiveGame();
+    }, []);
+
+    function rebuildCellMultipliers(
+        gridSize: number,
+        mineCount: number,
+        revealedCells: number[]
+    ): Record<number, number> {
+        const multipliers: Record<number, number> = {};
+        for (let i = 0; i < revealedCells.length; i++) {
+            const revealedCount = i + 1; // how many safe cells have been revealed up to this point
+            multipliers[revealedCells[i]] = Number(
+                calculateMultiplier(gridSize, mineCount, revealedCount).toFixed(2)
+            );
+        }
+        return multipliers;
+    }
 
     useEffect(() => {
         if (balance == null) return;
@@ -78,6 +127,36 @@ export default function MinesPage() {
         setBalanceUI(balance);
     }
 
+    // Same as backend
+    function calculateMultiplier(gridSize: number, mineCount: number, revealedSafeCells: number) {
+        const totalCells = gridSize * gridSize;
+        const safeCells = totalCells - mineCount;
+
+        if (revealedSafeCells === 0) return 1;
+
+        let multiplier = 1;
+        for (let i = 0; i < revealedSafeCells; i++) {
+            multiplier *= (totalCells - i) / (safeCells - i);
+        }
+
+        // Apply a small house edge
+        multiplier *= 0.99;
+
+        return multiplier;
+    }
+
+    // Same as backend
+    function calculateCashout(
+        betAmount: number,
+        gridSize: number,
+        mines: number,
+        revealedSafeCells: number
+    ): number {
+        if (betAmount <= 0) return 0;
+        const multiplier = calculateMultiplier(gridSize, mines, revealedSafeCells);
+        return (betAmount * (multiplier - 1));
+    }
+
     async function cashoutGame() {
         if (!gameId || gameState !== GameState.Playing) return;
 
@@ -110,11 +189,12 @@ export default function MinesPage() {
             }
 
             setGameState(data.gameState);
-            setCashout(data.cashout);
+            const cashout = calculateCashout(betAmount, pendingGridSize, pendingMineAmount, data.revealed.length);
+            setCashout(cashout);
 
             setCellMultipliers(prev => ({
                 ...prev,
-                [index]: Number(data.multiplier.toFixed(2)),
+                [index]: Number(calculateMultiplier(pendingGridSize, pendingMineAmount, data.revealed.length).toFixed(2)),
             }));
         } catch (err) {
             alert("Something went wrong. Please try again.");
