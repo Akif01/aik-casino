@@ -143,7 +143,7 @@ export default function DicePage() {
                                 style={{
                                     background: `linear-gradient(
                             to right, 
-                            #0f0 ${percentage}%, 
+                            var(--primary-green) ${percentage}%, 
                             red ${percentage}%)`
                                 }}
                             >

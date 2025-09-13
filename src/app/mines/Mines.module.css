@@ -20,13 +20,13 @@
 }
 
 .gridCellRevealed {
-    background-color: #0f0 !important;
+    background-color: var(--primary-green) !important;
     cursor: not-allowed;
 }
 
 .gridCellRevealed:hover {
     transform: none;
-    background-color: #0f0 !important;
+    background-color: var(--primary-green) !important;
 }
 
 .gridCellMineRevealed,
@@ -52,7 +52,7 @@
 }
 
 .wonText {
-    color: #0f0;
+    color: var(--primary-green);
 }
 
 .wonText,
