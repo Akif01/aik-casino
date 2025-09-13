@@ -1,3 +1,7 @@
+:root {
+  --primary-green: #0f0;
+}
+
 body {
   background: linear-gradient(135deg, #001700, #000);
   background-attachment: scroll;
@@ -19,7 +23,7 @@ button {
   font-size: 16px;
   border: none;
   border-radius: 6px;
-  background-color: #0f0;
+  background-color: var(--primary-green);
   color: #000;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -27,7 +31,7 @@ button {
 
 button:hover {
   transform: scale(1.05);
-  background-color: #0c0;
+  background-color: var(--primary-green);
 }
 
 button:disabled,
@@ -38,7 +42,7 @@ button:disabled:hover {
 }
 
 input {
-  border: 1px solid #0f0;
+  border: 1px solid var(--primary-green);
   padding: 5px;
   color: white;
 }
