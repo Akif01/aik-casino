@@ -69,7 +69,7 @@
 }
 
 .wonText {
-    color: #0f0;
+    color: var(--primary-green);
 }
 
 .wonText,
