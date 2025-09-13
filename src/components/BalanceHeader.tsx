@@ -71,8 +71,16 @@ export default function BalanceHeader() {
 
     return (
         <div className={styles.balance}>
-            <span className={styles.balanceText}>{balance !== null ? `Balance: $${balance.toFixed(2)}` : "Loading..."}</span>
-            <button className={styles.topUpButton} title="Top Up Balance" onClick={handleShowTopUpOverlay}>
+            <span
+                className={styles.balanceText}
+            >
+                {balance !== null ? `Balance: $${balance.toFixed(2)}` : "Loading..."}
+            </span>
+            <button
+                className={styles.topUpButton}
+                title="Top Up Balance"
+                onClick={handleShowTopUpOverlay}
+                disabled={topUpInProgress || showOverlay}>
                 <span className="material-symbols-outlined">credit_card</span>
             </button>
             {showOverlay && <OverlayPanel headerText="Top Up Blanace" onClose={handleCloseTopUpOverlay} children={renderTopUpContent()} />}

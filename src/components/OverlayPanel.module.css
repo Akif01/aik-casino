@@ -24,13 +24,16 @@
 .header {
     display: flex;
     align-items: center;
-    font-weight: 900;
+
     justify-content: space-between;
     padding-bottom: 0.25rem;
     gap: 1rem;
 }
 
-.headerText {}
+.headerText {
+    color: white;
+    font-weight: 900;
+}
 
 .closeButton {
     padding: 0.2rem 0.4rem;
