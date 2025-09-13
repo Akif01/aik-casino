@@ -6,33 +6,32 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 
 type SessionContextType = {
     balance: number | null;
-    setBalanceUI: (balance: number) => void;
+    refreshBalance: () => Promise<void>;
 }
 
 const SessionContext = createContext<SessionContextType>({
     balance: null,
-    setBalanceUI: () => { },
+    refreshBalance: async () => { },
 });
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-    const [balance, setBalanceUI] = useState<number | null>(null);
+    const [balance, setBalance] = useState<number | null>(null);
+
+    const refreshBalance = async () => {
+        try {
+            await initSession();
+            const data = await getBalance();
+            setBalance(data.balance);
+        } catch (err) {
+        }
+    };
 
     useEffect(() => {
-        const fetchBalance = async () => {
-            try {
-                // The cookie is automatically sent, no sessionId required
-                await initSession();
-                const data = await getBalance();
-                setBalanceUI(data.balance);
-            } catch (err) {
-            }
-        };
-
-        fetchBalance();
+        refreshBalance();
     }, []);
 
     return (
-        <SessionContext.Provider value={{ balance, setBalanceUI }}>
+        <SessionContext.Provider value={{ balance, refreshBalance }}>
             {children}
         </SessionContext.Provider>
     );

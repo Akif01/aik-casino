@@ -11,7 +11,5 @@ export async function GET(req: Request) {
             { status: 404 });
     }
 
-    return NextResponse.json({
-        balance,
-    });
+    return NextResponse.json({ balance }, { status: 200 });
 }

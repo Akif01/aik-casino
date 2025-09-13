@@ -24,7 +24,7 @@ export default function MinesPage() {
     const [betAmount, setBetAmount] = useState(1);
     const [cashout, setCashout] = useState(0);
 
-    const { balance, setBalanceUI } = useSession();
+    const { balance, refreshBalance } = useSession();
 
     useEffect(() => {
         async function fetchLastActiveGame() {
@@ -123,8 +123,7 @@ export default function MinesPage() {
     }
 
     async function updateBalanceUI() {
-        const { balance } = await getBalance();
-        setBalanceUI(balance);
+        await refreshBalance();
     }
 
     // Same as backend

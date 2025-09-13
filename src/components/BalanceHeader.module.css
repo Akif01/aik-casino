@@ -1,4 +1,7 @@
 .balance {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
     margin-left: auto;
     background: rgba(26, 26, 26, 0.4);
     backdrop-filter: blur(12px);
@@ -6,4 +9,25 @@
     border-radius: 12px;
     box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.4);
     padding: 1rem;
+}
+
+.balanceText {
+    color: white;
+}
+
+.topUpButton {
+    display: flex;
+    align-items: center;
+    padding: 0.15rem 0.5rem;
+}
+
+.topUpOverlayPanelChildrenContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.topUpOverlayPanelTopUpButton {
+    font-weight: 900;
 }

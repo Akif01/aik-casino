@@ -24,5 +24,6 @@ export async function POST(req: Request) {
         state: game.state,
         multiplier: 0,
         cashout: 0,
-    });
+    },
+        { status: 200 });
 }

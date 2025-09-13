@@ -22,11 +22,13 @@ export async function POST(req: Request) {
             cashout: 0,
             betAmount: game.betAmount,
             mines: Array.from(game.mines),
-        });
+        },
+            { status: 200 });
     }
 
     return NextResponse.json({
         revealed: Array.from(game.revealed),
         gameState: game.state,
-    });
+    },
+        { status: 200 });
 }
