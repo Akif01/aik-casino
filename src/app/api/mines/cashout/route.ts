@@ -14,5 +14,6 @@ export async function POST(req: Request) {
     return NextResponse.json({
         cashout: result.cashout,
         gameState: result.gameState
-    });
+    },
+        { status: 200 });
 }

@@ -10,7 +10,7 @@ type BetInputProps = {
 }
 
 export default function BetInput({ disabled, onChange }: BetInputProps) {
-    const { balance, setBalanceUI } = useSession();
+    const { balance } = useSession();
     const [betAmount, setBetAmount] = useState(1);
 
     useEffect(() => {

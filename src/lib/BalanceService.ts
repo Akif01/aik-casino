@@ -29,3 +29,14 @@ export async function tryUpdateBalance(
 
     return newBalance;
 }
+
+export async function topUpBalance(sessionId: string, amount: number): Promise<number | null> {
+    const current = await getBalanceBySession(sessionId);
+
+    if (current === null || current === undefined) return null;
+
+    const newBalance = current + amount;
+    global.balances[sessionId] = newBalance;
+
+    return newBalance;
+}

@@ -13,8 +13,8 @@ export function middleware(req: NextRequest) {
 
     if (!sessionId) {
         return NextResponse.json(
-            { error: "No session provided" },
-            { status: 400 }
+            { error: "Unauthorized" },
+            { status: 401 }
         );
     }
 

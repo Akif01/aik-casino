@@ -8,7 +8,7 @@ body {
   background-size: auto;
   background-attachment: fixed;
   background-size: cover;
-  color: white;
+  color: var(--primary-green);
 }
 
 html,

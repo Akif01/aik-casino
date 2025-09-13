@@ -22,5 +22,6 @@ export async function POST(req: Request) {
         guessedDiceNumber: game.guessedDiceNumber,
         multiplier: game.multiplier,
         cashout: game.cashout,
-    });
+    },
+        { status: 200 });
 }

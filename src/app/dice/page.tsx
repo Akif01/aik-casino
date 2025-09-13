@@ -8,10 +8,9 @@ import styles from "./Dice.module.css";
 import BetInput from "@/components/BetInput";
 import { roll } from "@/services/diceRequesterService";
 import { GameState } from "@/types/gameState";
-import { getBalance } from "@/services/balanceRequesterService";
 
 export default function DicePage() {
-    const { balance, setBalanceUI } = useSession();
+    const { balance, refreshBalance } = useSession();
 
     const [betAmount, setBetAmount] = useState(1);
     const [guessedDiceNumber, setGuessedDiceNumber] = useState(50);
@@ -60,8 +59,7 @@ export default function DicePage() {
     }
 
     async function updateBalanceUI() {
-        const { balance } = await getBalance();
-        setBalanceUI(balance);
+        await refreshBalance();
     }
 
     function calculateMultiplier(guess: number): number {
