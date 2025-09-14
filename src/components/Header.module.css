@@ -1,0 +1,12 @@
+.header {
+    display: flex;
+    font-weight: 900;
+    align-items: center;
+    padding-left: 1rem;
+}
+
+.headerText {
+    color: white;
+    font-weight: 900;
+    font-size: 1.5rem;
+}
