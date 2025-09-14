@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import BalanceHeader from "../components/BalanceHeader";
 import { SessionProvider } from "@/lib/sessionContext";
 import { initGlobals } from "@/lib/initGlobals";
+import Header from "@/components/Header";
 const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '700', '900'] });
 
 export const metadata: Metadata = {
@@ -31,9 +32,7 @@ export default function RootLayout({
           <div className={styles.layoutContainer}>
             <Navbar />
             <div className={styles.headerAndMainContainer}>
-              <header className={styles.header}>
-                <BalanceHeader />
-              </header>
+              <Header />
               <main className={styles.main}>
                 {children}
               </main>

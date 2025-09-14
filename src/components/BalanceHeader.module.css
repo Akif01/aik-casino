@@ -11,8 +11,74 @@
     padding: 1rem;
 }
 
+.balanceContainer {
+    position: relative;
+    display: inline-block;
+}
+
 .balanceText {
     color: white;
+    transition: all 0.3s ease;
+}
+
+.floatingAmount {
+    position: absolute;
+    left: 0;
+    bottom: 100%;
+    font-weight: bold;
+    font-size: 1.1em;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.floatingAmount.positive {
+    color: var(--primary-green);
+}
+
+.floatingAmount.negative {
+    color: red;
+}
+
+.floatingAmount.animate {
+    animation: floatUp 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1.1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(0.9);
+    }
+}
+
+.balanceText {
+    transition: all 0.3s ease;
+}
+
+.balance:has(.floatingAmount.positive.animate) .balanceText {
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
+}
+
+.balance:has(.floatingAmount.negative.animate) .balanceText {
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 
 .topUpButton {

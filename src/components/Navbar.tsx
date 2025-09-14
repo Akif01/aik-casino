@@ -10,6 +10,10 @@ const navItems = [
     { icon: "castle", label: "Tower", href: "/tower" },
 ];
 
+export function getCurrentPageName(pathname: string): string {
+    return pathname === "/" ? "Home" : navItems.find(item => item.href == pathname)?.label ?? "Home";
+}
+
 export default function Navbar() {
     const pathname = usePathname();
 
